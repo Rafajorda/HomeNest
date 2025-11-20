@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/extensions/context_localization.dart';
 import '../../core/models/product.dart';
 import '../../core/config/api_config.dart';
+import '../../core/services/favorites_service.dart';
+import '../../core/utils/snackbar.dart';
+import '../../providers/auth_provider.dart';
 
 /// Página de detalles de un producto.
 ///
@@ -16,25 +21,44 @@ import '../../core/config/api_config.dart';
 /// - Indicadores de página (dots)
 /// - Manejo de errores de carga de imágenes
 /// - Conversión de códigos hexadecimales a colores visuales
-class ProductDetailPage extends StatefulWidget {
+/// - Toggle de favoritos con actualización en tiempo real
+class ProductDetailPage extends ConsumerStatefulWidget {
   final Product product;
 
   const ProductDetailPage({super.key, required this.product});
 
   @override
-  State<ProductDetailPage> createState() => _ProductDetailPageState();
+  ConsumerState<ProductDetailPage> createState() => _ProductDetailPageState();
 }
 
-class _ProductDetailPageState extends State<ProductDetailPage> {
+class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
   /// Controlador para el carrusel de imágenes
   late PageController _pageController;
 
   /// Índice de la imagen actual en el carrusel
   int _currentPage = 0;
 
+  /// Servicio de favoritos
+  FavoritesService? _favoritesService;
+
+  /// Estado de favorito del producto
+  bool _isFavorite = false;
+
+  /// ID del favorito (necesario para eliminación)
+  int? _favoriteId;
+
+  /// Estado de carga del toggle de favorito
+  bool _isTogglingFavorite = false;
+
+  /// Contador local de favoritos (actualizado tras añadir/quitar)
+  late int _localFavoritesCount;
+
   @override
   void initState() {
     super.initState();
+    // Inicializar contador local con el valor del producto
+    _localFavoritesCount = widget.product.favoritesCount;
+
     // Inicializar el controlador del PageView
     _pageController = PageController();
 
@@ -44,6 +68,119 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         _currentPage = _pageController.page?.round() ?? 0;
       });
     });
+
+    // Verificar si el producto está en favoritos
+    _checkFavoriteStatus();
+  }
+
+  /// Verifica si el producto actual está en la lista de favoritos del usuario.
+  ///
+  /// Solo se ejecuta si el usuario está autenticado.
+  /// Actualiza [_isFavorite] y [_favoriteId] según el resultado.
+  Future<void> _checkFavoriteStatus() async {
+    final authState = ref.read(authProvider);
+    if (!authState.isAuthenticated || authState.accessToken == null) {
+      return;
+    }
+
+    try {
+      final interceptor = ref.read(authInterceptorProvider);
+      _favoritesService = FavoritesService(
+        interceptor: interceptor,
+        authToken: authState.accessToken!,
+      );
+      final isFav = await _favoritesService!.isFavorite(widget.product.id);
+
+      if (isFav && mounted) {
+        // Si es favorito, obtener el favoriteId
+        final favorites = await _favoritesService!.getMyFavorites();
+        final favorite = favorites.firstWhere(
+          (f) => f.product.id == widget.product.id,
+          orElse: () => favorites.first,
+        );
+
+        if (mounted) {
+          setState(() {
+            _isFavorite = true;
+            _favoriteId = favorite.id;
+          });
+        }
+      }
+    } catch (e) {
+      // Error silencioso al verificar estado
+      debugPrint('Error checking favorite status: $e');
+    }
+  }
+
+  /// Alterna el estado de favorito del producto.
+  ///
+  /// Si el producto está en favoritos, lo elimina.
+  /// Si no está en favoritos, lo añade.
+  ///
+  /// Muestra feedback al usuario mediante SnackBar.
+  /// Requiere autenticación.
+  Future<void> _toggleFavorite() async {
+    final authState = ref.read(authProvider);
+    if (!authState.isAuthenticated || authState.accessToken == null) {
+      if (mounted) {
+        GeneralSnackBar.error(context, context.loc!.mustLoginToAddFavorites);
+      }
+      return;
+    }
+
+    setState(() {
+      _isTogglingFavorite = true;
+    });
+
+    try {
+      final interceptor = ref.read(authInterceptorProvider);
+      _favoritesService ??= FavoritesService(
+        interceptor: interceptor,
+        authToken: authState.accessToken!,
+      );
+
+      if (_isFavorite && _favoriteId != null) {
+        // Eliminar de favoritos
+        await _favoritesService!.removeFromFavorites(_favoriteId!);
+        if (mounted) {
+          setState(() {
+            _isFavorite = false;
+            _favoriteId = null;
+            _isTogglingFavorite = false;
+            // Decrementar el contador localmente
+            _localFavoritesCount = (_localFavoritesCount - 1)
+                .clamp(0, double.infinity)
+                .toInt();
+          });
+          GeneralSnackBar.success(context, context.loc!.removedFromFavorites);
+        }
+      } else {
+        // Añadir a favoritos
+        final favorite = await _favoritesService!.addToFavorites(
+          widget.product.id,
+        );
+        if (mounted) {
+          setState(() {
+            _isFavorite = true;
+            _favoriteId = favorite.id;
+            _isTogglingFavorite = false;
+            // Incrementar el contador localmente
+            _localFavoritesCount++;
+          });
+          GeneralSnackBar.success(context, '¡Añadido a favoritos!');
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isTogglingFavorite = false;
+        });
+        GeneralSnackBar.error(
+          context,
+          'Error: ${e.toString().replaceAll('Exception: ', '')}',
+        );
+      }
+    }
   }
 
   @override
@@ -155,7 +292,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                                       ),
                                       const SizedBox(height: 16),
                                       Text(
-                                        'Error al cargar imagen',
+                                        context.loc!.errorLoadingImage,
                                         style: TextStyle(
                                           color: Colors.grey[600],
                                           fontSize: 14,
@@ -356,7 +493,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                   ),
                   _DetailItem(
                     title: "Favoritos",
-                    value: "${widget.product.favoritesCount} ❤️",
+                    value: "$_localFavoritesCount ❤️",
                   ),
                 ],
               ),
@@ -396,6 +533,31 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           ],
         ),
       ),
+      floatingActionButton: ref.watch(authProvider).isAuthenticated
+          ? FloatingActionButton.extended(
+              onPressed: _isTogglingFavorite ? null : _toggleFavorite,
+              backgroundColor: _isFavorite ? Colors.red : Colors.grey[300],
+              icon: _isTogglingFavorite
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Icon(
+                      _isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: _isFavorite ? Colors.white : Colors.grey[700],
+                    ),
+              label: Text(
+                _isFavorite ? context.loc!.inFavorites : context.loc!.addToFavorites,
+                style: TextStyle(
+                  color: _isFavorite ? Colors.white : Colors.grey[700],
+                ),
+              ),
+            )
+          : null,
     );
   }
 }

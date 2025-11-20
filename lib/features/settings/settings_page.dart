@@ -66,7 +66,7 @@ class SettingsPage extends ConsumerWidget {
                 onChanged: (locale) => notifier.setLocale(locale!),
               ),
               GeneralButton(
-                label: 'Ver catálogo de widgets generales',
+                label: context.loc!.viewWidgetCatalog,
                 icon: Icons.widgets,
                 onPressed: () {
                   Navigator.push(

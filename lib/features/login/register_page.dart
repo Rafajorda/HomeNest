@@ -13,24 +13,24 @@ class RegisterPage extends ConsumerStatefulWidget {
 }
 
 class _RegisterPageState extends ConsumerState<RegisterPage> {
-  final nameController = TextEditingController();
+  final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   @override
   void dispose() {
-    nameController.dispose();
+    usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _handleRegister() async {
-    final name = nameController.text.trim();
+    final username = usernameController.text.trim();
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -43,7 +43,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
 
     final authNotifier = ref.read(authProvider.notifier);
-    await authNotifier.register(name, email, password);
+    await authNotifier.register(username, email, password);
 
     // Verificar el resultado
     final authState = ref.read(authProvider);
@@ -83,10 +83,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: nameController,
+              controller: usernameController,
               enabled: !authState.isLoading,
               decoration: InputDecoration(
-                labelText: context.loc?.name ?? 'Name',
+                labelText: 'Username',
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.person),
               ),

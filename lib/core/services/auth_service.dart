@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
+import '../utils/service_messages.dart';
 
 /// Excepciones personalizadas para el servicio de autenticación
 class AuthException implements Exception {
@@ -20,6 +21,8 @@ class LoginResponse {
   final UserData user;
   final int? expiresIn; // Segundos hasta expiración del access token
   final String? tokenType; // "Bearer"
+  final int? accessTokenExpiresAt; // Timestamp en milisegundos
+  final int? refreshTokenExpiresAt; // Timestamp en milisegundos
 
   LoginResponse({
     required this.accessToken,
@@ -27,6 +30,8 @@ class LoginResponse {
     required this.user,
     this.expiresIn,
     this.tokenType,
+    this.accessTokenExpiresAt,
+    this.refreshTokenExpiresAt,
   });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
@@ -36,6 +41,8 @@ class LoginResponse {
       user: UserData.fromJson(json['user'] ?? {}),
       expiresIn: json['expires_in'],
       tokenType: json['token_type'] ?? 'Bearer',
+      accessTokenExpiresAt: json['access_token_expires_at'],
+      refreshTokenExpiresAt: json['refresh_token_expires_at'],
     );
   }
 }
@@ -46,12 +53,16 @@ class RefreshTokenResponse {
   final String refreshToken;
   final int expiresIn;
   final String tokenType;
+  final int? accessTokenExpiresAt; // Timestamp en milisegundos
+  final int? refreshTokenExpiresAt; // Timestamp en milisegundos
 
   RefreshTokenResponse({
     required this.accessToken,
     required this.refreshToken,
     required this.expiresIn,
     required this.tokenType,
+    this.accessTokenExpiresAt,
+    this.refreshTokenExpiresAt,
   });
 
   factory RefreshTokenResponse.fromJson(Map<String, dynamic> json) {
@@ -60,6 +71,8 @@ class RefreshTokenResponse {
       refreshToken: json['refresh_token'] ?? '',
       expiresIn: json['expires_in'] ?? 900, // Default 15 minutos
       tokenType: json['token_type'] ?? 'Bearer',
+      accessTokenExpiresAt: json['access_token_expires_at'],
+      refreshTokenExpiresAt: json['refresh_token_expires_at'],
     );
   }
 }
@@ -168,24 +181,27 @@ class AuthService {
         try {
           final error = jsonDecode(response.body);
           throw AuthException(
-            error['message'] ?? 'Credenciales inválidas',
+            error['message'] ?? ServiceMessages.invalidCredentials,
             statusCode: 401,
           );
         } catch (e) {
           if (e is AuthException) rethrow;
-          throw AuthException('Credenciales inválidas', statusCode: 401);
+          throw AuthException(
+            ServiceMessages.invalidCredentials,
+            statusCode: 401,
+          );
         }
       } else if (response.statusCode == 400) {
         try {
           final error = jsonDecode(response.body);
           throw AuthException(
-            error['message'] ?? 'Email o contraseña incorrectos',
+            error['message'] ?? ServiceMessages.emailOrPasswordIncorrect,
             statusCode: 400,
           );
         } catch (e) {
           if (e is AuthException) rethrow;
           throw AuthException(
-            'Email o contraseña incorrectos',
+            ServiceMessages.emailOrPasswordIncorrect,
             statusCode: 400,
           );
         }
@@ -193,13 +209,13 @@ class AuthService {
         try {
           final error = jsonDecode(response.body);
           throw AuthException(
-            error['message'] ?? 'Error al iniciar sesión',
+            error['message'] ?? ServiceMessages.loginError,
             statusCode: response.statusCode,
           );
         } catch (e) {
           if (e is AuthException) rethrow;
           throw AuthException(
-            'Error al iniciar sesión',
+            ServiceMessages.loginError,
             statusCode: response.statusCode,
           );
         }
@@ -207,15 +223,13 @@ class AuthService {
     } on AuthException {
       rethrow;
     } catch (e) {
-      throw AuthException(
-        'Error de conexión al servidor. Verifica que el backend esté corriendo.',
-      );
+      throw AuthException(ServiceMessages.connectionToServerError);
     }
   }
 
   /// Registro de nuevo usuario
   Future<LoginResponse> register({
-    required String name,
+    required String username,
     required String email,
     required String password,
   }) async {
@@ -224,24 +238,7 @@ class AuthService {
         '${ApiConfig.baseUrl}${ApiConfig.registerEndpoint}',
       );
 
-      // Separar el nombre en firstName y lastName
-      final nameParts = name.trim().split(' ');
-      final firstName = nameParts.isNotEmpty ? nameParts[0] : name;
-      final lastName = nameParts.length > 1
-          ? nameParts.sublist(1).join(' ')
-          : '';
-
-      // Generar username desde el email
-      final username = email.split('@')[0];
-
-      final body = {
-        'firstName': firstName,
-        'lastName': lastName.isEmpty ? firstName : lastName,
-        'username': username,
-        'email': email,
-        'password': password,
-        'address': '', // Campo requerido por el backend
-      };
+      final body = {'username': username, 'email': email, 'password': password};
 
       final response = await _client
           .post(url, headers: ApiConfig.defaultHeaders, body: jsonEncode(body))
@@ -255,13 +252,13 @@ class AuthService {
         try {
           final error = jsonDecode(response.body);
           throw AuthException(
-            error['message'] ?? 'El email o nombre de usuario ya está en uso',
+            error['message'] ?? ServiceMessages.emailOrUsernameInUse,
             statusCode: 409,
           );
         } catch (e) {
           if (e is AuthException) rethrow;
           throw AuthException(
-            'El email o nombre de usuario ya está en uso',
+            ServiceMessages.emailOrUsernameInUse,
             statusCode: 409,
           );
         }
@@ -272,23 +269,23 @@ class AuthService {
           final message = error['message'];
           final errorMsg = message is List
               ? message.join(', ')
-              : message ?? 'Error de validación';
+              : message ?? ServiceMessages.validationError;
           throw AuthException(errorMsg, statusCode: 400);
         } catch (e) {
           if (e is AuthException) rethrow;
-          throw AuthException('Error de validación', statusCode: 400);
+          throw AuthException(ServiceMessages.validationError, statusCode: 400);
         }
       } else {
         try {
           final error = jsonDecode(response.body);
           throw AuthException(
-            error['message'] ?? 'Error al registrarse',
+            error['message'] ?? ServiceMessages.registrationError,
             statusCode: response.statusCode,
           );
         } catch (e) {
           if (e is AuthException) rethrow;
           throw AuthException(
-            'Error al registrarse',
+            ServiceMessages.registrationError,
             statusCode: response.statusCode,
           );
         }
@@ -296,9 +293,7 @@ class AuthService {
     } on AuthException {
       rethrow;
     } catch (e) {
-      throw AuthException(
-        'Error de conexión al servidor. Verifica que el backend esté corriendo.',
-      );
+      throw AuthException(ServiceMessages.connectionToServerError);
     }
   }
 
@@ -319,20 +314,17 @@ class AuthService {
         final data = jsonDecode(response.body);
         return RefreshTokenResponse.fromJson(data);
       } else if (response.statusCode == 401) {
-        throw AuthException(
-          'Sesión expirada. Por favor, inicia sesión nuevamente.',
-          statusCode: 401,
-        );
+        throw AuthException(ServiceMessages.sessionExpired, statusCode: 401);
       } else {
         throw AuthException(
-          'Error al refrescar la sesión',
+          ServiceMessages.errorRefreshingSession,
           statusCode: response.statusCode,
         );
       }
     } on AuthException {
       rethrow;
     } catch (e) {
-      throw AuthException('Error de conexión al refrescar la sesión');
+      throw AuthException(ServiceMessages.connectionErrorRefreshing);
     }
   }
 

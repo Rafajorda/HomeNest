@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../models/product.dart';
 import '../models/product_filters.dart';
+import './auth_interceptor.dart';
 
 /// Excepciones para el servicio de productos
 class ProductException implements Exception {
@@ -17,11 +18,11 @@ class ProductException implements Exception {
 
 /// Servicio de productos - maneja todas las peticiones relacionadas con productos
 class ProductService {
-  final http.Client _client;
+  final AuthInterceptor? _interceptor;
   final String? _authToken;
 
-  ProductService({http.Client? client, String? authToken})
-    : _client = client ?? http.Client(),
+  ProductService({AuthInterceptor? interceptor, String? authToken})
+    : _interceptor = interceptor,
       _authToken = authToken;
 
   /// Obtiene todos los productos (opcionalmente con filtros)
@@ -34,14 +35,18 @@ class ProductService {
                 filters?.toQueryParameters() ?? {'status': 'active'},
           );
 
-      final response = await _client
-          .get(
-            uri,
-            headers: _authToken != null
-                ? ApiConfig.authHeaders(_authToken)
-                : ApiConfig.defaultHeaders,
-          )
-          .timeout(ApiConfig.connectionTimeout);
+      final headers = _authToken != null
+          ? ApiConfig.authHeaders(_authToken)
+          : ApiConfig.defaultHeaders;
+
+      http.Response response;
+      if (_interceptor != null) {
+        response = await _interceptor.get(uri, headers: headers);
+      } else {
+        response = await http
+            .get(uri, headers: headers)
+            .timeout(ApiConfig.connectionTimeout);
+      }
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
@@ -90,14 +95,18 @@ class ProductService {
         '${ApiConfig.baseUrl}${ApiConfig.productByIdEndpoint(id)}',
       );
 
-      final response = await _client
-          .get(
-            url,
-            headers: _authToken != null
-                ? ApiConfig.authHeaders(_authToken)
-                : ApiConfig.defaultHeaders,
-          )
-          .timeout(ApiConfig.connectionTimeout);
+      final headers = _authToken != null
+          ? ApiConfig.authHeaders(_authToken)
+          : ApiConfig.defaultHeaders;
+
+      http.Response response;
+      if (_interceptor != null) {
+        response = await _interceptor.get(url, headers: headers);
+      } else {
+        response = await http
+            .get(url, headers: headers)
+            .timeout(ApiConfig.connectionTimeout);
+      }
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -123,14 +132,18 @@ class ProductService {
         '${ApiConfig.baseUrl}${ApiConfig.productsByCategoryEndpoint}/$category',
       );
 
-      final response = await _client
-          .get(
-            url,
-            headers: _authToken != null
-                ? ApiConfig.authHeaders(_authToken)
-                : ApiConfig.defaultHeaders,
-          )
-          .timeout(ApiConfig.connectionTimeout);
+      final headers = _authToken != null
+          ? ApiConfig.authHeaders(_authToken)
+          : ApiConfig.defaultHeaders;
+
+      http.Response response;
+      if (_interceptor != null) {
+        response = await _interceptor.get(url, headers: headers);
+      } else {
+        response = await http
+            .get(url, headers: headers)
+            .timeout(ApiConfig.connectionTimeout);
+      }
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -154,14 +167,18 @@ class ProductService {
         '${ApiConfig.baseUrl}${ApiConfig.productsEndpoint}/search',
       ).replace(queryParameters: {'q': query});
 
-      final response = await _client
-          .get(
-            url,
-            headers: _authToken != null
-                ? ApiConfig.authHeaders(_authToken)
-                : ApiConfig.defaultHeaders,
-          )
-          .timeout(ApiConfig.connectionTimeout);
+      final headers = _authToken != null
+          ? ApiConfig.authHeaders(_authToken)
+          : ApiConfig.defaultHeaders;
+
+      http.Response response;
+      if (_interceptor != null) {
+        response = await _interceptor.get(url, headers: headers);
+      } else {
+        response = await http
+            .get(url, headers: headers)
+            .timeout(ApiConfig.connectionTimeout);
+      }
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -176,10 +193,5 @@ class ProductService {
       if (e is ProductException) rethrow;
       throw ProductException('Error de conexión: ${e.toString()}');
     }
-  }
-
-  /// Cierra el cliente HTTP
-  void dispose() {
-    _client.close();
   }
 }

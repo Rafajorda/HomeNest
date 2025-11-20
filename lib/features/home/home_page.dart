@@ -5,16 +5,19 @@ import 'package:proyecto_1/core/models/product.dart';
 import 'package:proyecto_1/core/models/category.dart';
 import 'package:proyecto_1/core/models/color.dart';
 import 'package:proyecto_1/core/models/product_filters.dart';
-import 'package:proyecto_1/core/widgets/general_chip.dart';
 import 'package:proyecto_1/core/services/product_service.dart';
 import 'package:proyecto_1/core/services/category_service.dart';
 import 'package:proyecto_1/core/services/color_service.dart';
+import 'package:proyecto_1/core/services/favorites_service.dart';
 import 'package:proyecto_1/providers/auth_provider.dart';
 import 'package:proyecto_1/features/settings/settings_page.dart';
 import 'package:proyecto_1/features/profile/profile_page.dart';
 import 'widgets/product_grid.dart';
 import 'widgets/user_greeting.dart';
 import 'widgets/product_filters_dialog.dart';
+import 'widgets/home_error_view.dart';
+import 'widgets/category_chips_list.dart';
+import 'widgets/home_app_bar.dart';
 
 /// Página principal de la aplicación (Home).
 ///
@@ -59,6 +62,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   ProductService? _productService;
   CategoryService? _categoryService;
   ColorService? _colorService;
+  FavoritesService? _favoritesService;
+
+  // Lista de IDs de productos favoritos (para mostrar corazones)
+  Set<String> _favoriteProductIds = {};
 
   @override
   void initState() {
@@ -68,7 +75,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
   @override
   void dispose() {
-    _productService?.dispose();
     _categoryService?.dispose();
     _colorService?.dispose();
     super.dispose();
@@ -80,8 +86,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
   /// 1. Obtiene token de autenticación del authProvider
   /// 2. Inicializa servicios HTTP con el token
   /// 3. Combina filtros actuales + categoría seleccionada
-  /// 4. Hace peticiones paralelas con Future.wait (optimización)
-  /// 5. Actualiza estado con los datos recibidos
+  /// 4. Si onlyFavorites es true, carga desde FavoritesService
+  /// 5. Hace peticiones paralelas con Future.wait (optimización)
+  /// 6. Actualiza estado con los datos recibidos
   ///
   /// Parámetros:
   /// - [filters]: Filtros opcionales a aplicar (si null, usa los actuales)
@@ -94,11 +101,20 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     });
 
     try {
-      // Obtener el token de autenticación si está disponible
+      // Obtener el token de autenticación y el interceptor si está disponible
       final authState = ref.read(authProvider);
-      _productService = ProductService(authToken: authState.accessToken);
+      final interceptor = ref.read(authInterceptorProvider);
+
+      _productService = ProductService(
+        interceptor: interceptor,
+        authToken: authState.accessToken,
+      );
       _categoryService = CategoryService(authToken: authState.accessToken);
       _colorService = ColorService(authToken: authState.accessToken);
+      _favoritesService = FavoritesService(
+        interceptor: interceptor,
+        authToken: authState.accessToken,
+      );
 
       // Crear filtros con la categoría seleccionada actual
       final baseFilters = filters ?? _currentFilters;
@@ -116,6 +132,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               minPrice: filtersWithCategory.minPrice,
               maxPrice: filtersWithCategory.maxPrice,
               hasModel3D: filtersWithCategory.hasModel3D,
+              onlyFavorites: filtersWithCategory.onlyFavorites,
               status: filtersWithCategory.status ?? 'active',
               sortBy: filtersWithCategory.sortBy,
               order: filtersWithCategory.order,
@@ -125,16 +142,43 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             )
           : filtersWithCategory;
 
-      // Cargar productos, categorías y colores en paralelo para mejor performance
+      List<Product> loadedProducts;
+
+      // Si el filtro "Solo favoritos" está activo, cargar desde FavoritesService
+      if (finalFilters.onlyFavorites == true) {
+        if (authState.isAuthenticated) {
+          final favorites = await _favoritesService!.getMyFavorites();
+          loadedProducts = favorites.map((f) => f.product).toList();
+
+          // Aplicar filtros locales (búsqueda, precio, etc)
+          loadedProducts = _applyLocalFilters(loadedProducts, finalFilters);
+        } else {
+          // Usuario no autenticado, no puede ver favoritos
+          loadedProducts = [];
+        }
+      } else {
+        // Carga normal desde ProductService
+        loadedProducts = await _productService!.getAllProducts(finalFilters);
+      }
+
+      // Cargar categorías y colores en paralelo
       final results = await Future.wait([
-        _productService!.getAllProducts(finalFilters),
         _categoryService!.getAllCategories(),
         _colorService!.getAllColors(),
       ]);
 
-      final loadedProducts = results[0] as List<Product>;
-      final loadedCategories = results[1] as List<Category>;
-      final loadedColors = results[2] as List<ColorModel>;
+      final loadedCategories = results[0] as List<Category>;
+      final loadedColors = results[1] as List<ColorModel>;
+
+      // Cargar IDs de favoritos para mostrar corazones (solo si está autenticado)
+      if (authState.isAuthenticated) {
+        try {
+          final favorites = await _favoritesService!.getMyFavorites();
+          _favoriteProductIds = favorites.map((f) => f.product.id).toSet();
+        } catch (e) {
+          _favoriteProductIds = {};
+        }
+      }
 
       setState(() {
         products = loadedProducts;
@@ -149,6 +193,72 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
         errorMessage = e.toString();
       });
     }
+  }
+
+  /// Aplica filtros locales a una lista de productos.
+  /// Usado cuando se carga desde favoritos (no hay filtros backend).
+  List<Product> _applyLocalFilters(
+    List<Product> products,
+    ProductFilters filters,
+  ) {
+    var filtered = products;
+
+    // Filtro de búsqueda
+    if (filters.search != null && filters.search!.isNotEmpty) {
+      final searchLower = filters.search!.toLowerCase();
+      filtered = filtered.where((p) {
+        return p.name.toLowerCase().contains(searchLower) ||
+            p.description.toLowerCase().contains(searchLower);
+      }).toList();
+    }
+
+    // Filtro de precio mínimo
+    if (filters.minPrice != null) {
+      filtered = filtered.where((p) => p.price >= filters.minPrice!).toList();
+    }
+
+    // Filtro de precio máximo
+    if (filters.maxPrice != null) {
+      filtered = filtered.where((p) => p.price <= filters.maxPrice!).toList();
+    }
+
+    // Filtro de modelo 3D
+    if (filters.hasModel3D != null) {
+      filtered = filtered.where((p) {
+        final hasModel = p.images.isNotEmpty; // Simplificado
+        return filters.hasModel3D! ? hasModel : !hasModel;
+      }).toList();
+    }
+
+    // Filtro de color
+    if (filters.colorId != null && filters.colorId!.isNotEmpty) {
+      filtered = filtered.where((p) {
+        return p.colors.any((c) => c.id == filters.colorId);
+      }).toList();
+    }
+
+    // Ordenamiento
+    if (filters.sortBy != null) {
+      filtered = List.from(filtered);
+      switch (filters.sortBy) {
+        case 'name':
+          filtered.sort((a, b) => a.name.compareTo(b.name));
+          break;
+        case 'price':
+          filtered.sort((a, b) => a.price.compareTo(b.price));
+          break;
+        case 'favoritesCount':
+          filtered.sort((a, b) => a.favoritesCount.compareTo(b.favoritesCount));
+          break;
+      }
+
+      // Orden descendente si se especifica
+      if (filters.order == 'DESC') {
+        filtered = filtered.reversed.toList();
+      }
+    }
+
+    return filtered;
   }
 
   List<Product> get filteredProducts => products;
@@ -177,104 +287,40 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
 
     // Mostrar error si hubo algún problema
     if (errorMessage != null) {
-      return Scaffold(
-        appBar: AppBar(title: Text(context.loc!.appTitle)),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Error al cargar productos',
-                  style: Theme.of(context).textTheme.titleLarge,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  errorMessage!,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton.icon(
-                  onPressed: _loadData,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Reintentar'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
+      return HomeErrorView(errorMessage: errorMessage!, onRetry: _loadData);
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(context.loc!.appTitle),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const SettingsPage()),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.account_circle),
-            tooltip: 'Profile',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfilePage()),
-              );
-            },
-          ),
-        ],
+      appBar: HomeAppBar(
+        onSettingsTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SettingsPage()),
+        ),
+        onProfileTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const ProfilePage()),
+        ),
       ),
       body: Column(
         children: [
           const UserGreeting(),
 
           // Chips de categorías
-          SizedBox(
-            height: 50,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6),
-                  child: GeneralChip(
-                    label: category.name,
-                    isSelected: category.id == selectedCategoryId,
-                    onSelected: () {
-                      setState(() {
-                        // Toggle: si ya está seleccionada, deseleccionar
-                        if (selectedCategoryId == category.id) {
-                          selectedCategoryId = null;
-                          selectedCategoryUuid = null; // ✅ Limpiar UUID
-                        } else {
-                          selectedCategoryId = category.id;
-                          selectedCategoryUuid =
-                              category.uuid; // ✅ Guardar UUID
-                        }
-                      });
-                      // Recargar productos con los filtros actuales + nueva categoría
-                      _loadData();
-                    },
-                  ),
-                );
-              },
-            ),
+          CategoryChipsList(
+            categories: categories,
+            selectedCategoryId: selectedCategoryId,
+            onCategorySelected: (category) {
+              setState(() {
+                if (category == null) {
+                  selectedCategoryId = null;
+                  selectedCategoryUuid = null;
+                } else {
+                  selectedCategoryId = category.id;
+                  selectedCategoryUuid = category.uuid;
+                }
+              });
+              _loadData();
+            },
           ),
 
           // Barra de filtros y búsqueda
@@ -289,7 +335,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                   child: FilledButton.tonalIcon(
                     onPressed: _openFiltersDialog,
                     icon: const Icon(Icons.filter_list),
-                    label: const Text('Filtros'),
+                    label: Text(context.loc!.filters),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -318,7 +364,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                               label: Text(
                                 '🎨 ${colors.firstWhere(
                                   (c) => c.id == _currentFilters.colorId,
-                                  orElse: () => ColorModel(id: '', name: 'Color seleccionado'),
+                                  orElse: () => ColorModel(id: '', name: context.loc!.color),
                                 ).name}',
                               ),
                               onDeleted: () {
@@ -350,11 +396,25 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
                           ],
                           if (_currentFilters.hasModel3D == true) ...[
                             Chip(
-                              label: const Text('📦 3D'),
+                              label: Text('📦 ${context.loc!.model3D}'),
                               onDeleted: () {
                                 _loadData(
                                   _currentFilters.copyWith(
                                     clearHasModel3D: true,
+                                  ),
+                                );
+                              },
+                              deleteIcon: const Icon(Icons.close, size: 18),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
+                          if (_currentFilters.onlyFavorites == true) ...[
+                            Chip(
+                              label: Text('❤️ ${context.loc!.onlyFavorites}'),
+                              onDeleted: () {
+                                _loadData(
+                                  _currentFilters.copyWith(
+                                    clearOnlyFavorites: true,
                                   ),
                                 );
                               },
@@ -398,7 +458,16 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
           ),
 
           // Grid de productos
-          Expanded(child: ProductGrid(products: filteredProducts)),
+          Expanded(
+            child: ProductGrid(
+              products: filteredProducts,
+              favoriteProductIds: _favoriteProductIds,
+              onProductReturn: () {
+                // Recargar productos cuando vuelve de detalles
+                _loadData(_currentFilters);
+              },
+            ),
+          ),
         ],
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:proyecto_1/core/services/auth_service.dart';
+import 'package:proyecto_1/core/services/auth_interceptor.dart';
 
 class AuthState {
   final bool isLoading;
@@ -11,6 +12,8 @@ class AuthState {
   final String? userEmail;
   final String? accessToken;
   final String? refreshToken;
+  final int? accessTokenExpiresAt; // Timestamp en milisegundos
+  final int? refreshTokenExpiresAt; // Timestamp en milisegundos
 
   const AuthState({
     this.isLoading = false,
@@ -20,7 +23,24 @@ class AuthState {
     this.userEmail,
     this.accessToken,
     this.refreshToken,
+    this.accessTokenExpiresAt,
+    this.refreshTokenExpiresAt,
   });
+
+  /// Verifica si el access token está expirado o próximo a expirar (1 min de margen)
+  bool get isAccessTokenExpired {
+    if (accessTokenExpiresAt == null) return false;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final expiresIn = accessTokenExpiresAt! - now;
+    return expiresIn < 60000; // Menos de 1 minuto
+  }
+
+  /// Verifica si el refresh token está expirado
+  bool get isRefreshTokenExpired {
+    if (refreshTokenExpiresAt == null) return false;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    return now >= refreshTokenExpiresAt!;
+  }
 
   AuthState copyWith({
     bool? isLoading,
@@ -30,6 +50,8 @@ class AuthState {
     String? userEmail,
     String? accessToken,
     String? refreshToken,
+    int? accessTokenExpiresAt,
+    int? refreshTokenExpiresAt,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
@@ -39,6 +61,9 @@ class AuthState {
       userEmail: userEmail ?? this.userEmail,
       accessToken: accessToken ?? this.accessToken,
       refreshToken: refreshToken ?? this.refreshToken,
+      accessTokenExpiresAt: accessTokenExpiresAt ?? this.accessTokenExpiresAt,
+      refreshTokenExpiresAt:
+          refreshTokenExpiresAt ?? this.refreshTokenExpiresAt,
     );
   }
 }
@@ -49,6 +74,7 @@ class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() {
     _authService = AuthService();
+
     // Cargar estado de autenticación al inicializar
     _loadAuthState();
 
@@ -58,9 +84,8 @@ class AuthNotifier extends Notifier<AuthState> {
     });
 
     return const AuthState();
-  }
+  } // Cargar el estado guardado
 
-  // Cargar el estado guardado
   Future<void> _loadAuthState() async {
     final prefs = await SharedPreferences.getInstance();
     final isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
@@ -68,6 +93,8 @@ class AuthNotifier extends Notifier<AuthState> {
     final userEmail = prefs.getString('userEmail');
     final accessToken = prefs.getString('accessToken');
     final refreshToken = prefs.getString('refreshToken');
+    final accessTokenExpiresAt = prefs.getInt('accessTokenExpiresAt');
+    final refreshTokenExpiresAt = prefs.getInt('refreshTokenExpiresAt');
 
     // 🔐 SESIÓN PERMANENTE: Si hay tokens guardados, siempre intentar restaurar
     if (isAuthenticated && refreshToken != null) {
@@ -75,10 +102,28 @@ class AuthNotifier extends Notifier<AuthState> {
         '[AuthProvider] 🔄 Detectados tokens guardados, restaurando sesión...',
       );
 
-      // Verificar si el access token sigue siendo válido
-      final isValid = await _authService.verifyToken(accessToken ?? '');
+      // ⚠️ VERIFICAR SI EL REFRESH TOKEN EXPIRÓ (> 7 días)
+      if (refreshTokenExpiresAt != null) {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        if (now >= refreshTokenExpiresAt) {
+          debugPrint(
+            '[AuthProvider] ❌ Refresh token expirado, forzando logout',
+          );
+          await _clearAuthState();
+          state = const AuthState();
+          return;
+        }
+      }
 
-      if (isValid && accessToken != null) {
+      // Verificar si el access token está próximo a expirar (< 1 min)
+      bool needsRefresh = false;
+      if (accessTokenExpiresAt != null) {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        final expiresIn = accessTokenExpiresAt - now;
+        needsRefresh = expiresIn < 60000; // Menos de 1 minuto
+      }
+
+      if (!needsRefresh && accessToken != null) {
         // ✅ Access token válido - restaurar sesión directamente
         debugPrint('[AuthProvider] ✅ Access token válido, sesión restaurada');
         state = state.copyWith(
@@ -87,6 +132,8 @@ class AuthNotifier extends Notifier<AuthState> {
           userEmail: userEmail,
           accessToken: accessToken,
           refreshToken: refreshToken,
+          accessTokenExpiresAt: accessTokenExpiresAt,
+          refreshTokenExpiresAt: refreshTokenExpiresAt,
         );
       } else {
         // 🔄 Access token expirado o inválido - intentar refresh automático
@@ -104,6 +151,8 @@ class AuthNotifier extends Notifier<AuthState> {
             userEmail: userEmail,
             accessToken: response.accessToken,
             refreshToken: response.refreshToken,
+            accessTokenExpiresAt: response.accessTokenExpiresAt,
+            refreshTokenExpiresAt: response.refreshTokenExpiresAt,
           );
 
           // Actualizar estado
@@ -113,6 +162,8 @@ class AuthNotifier extends Notifier<AuthState> {
             userEmail: userEmail,
             accessToken: response.accessToken,
             refreshToken: response.refreshToken,
+            accessTokenExpiresAt: response.accessTokenExpiresAt,
+            refreshTokenExpiresAt: response.refreshTokenExpiresAt,
           );
 
           debugPrint('[AuthProvider] ✅ Sesión restaurada con refresh token');
@@ -155,6 +206,8 @@ class AuthNotifier extends Notifier<AuthState> {
     String? userEmail,
     String? accessToken,
     String? refreshToken,
+    int? accessTokenExpiresAt,
+    int? refreshTokenExpiresAt,
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isAuthenticated', isAuthenticated);
@@ -163,6 +216,12 @@ class AuthNotifier extends Notifier<AuthState> {
     if (accessToken != null) await prefs.setString('accessToken', accessToken);
     if (refreshToken != null) {
       await prefs.setString('refreshToken', refreshToken);
+    }
+    if (accessTokenExpiresAt != null) {
+      await prefs.setInt('accessTokenExpiresAt', accessTokenExpiresAt);
+    }
+    if (refreshTokenExpiresAt != null) {
+      await prefs.setInt('refreshTokenExpiresAt', refreshTokenExpiresAt);
     }
   }
 
@@ -174,6 +233,8 @@ class AuthNotifier extends Notifier<AuthState> {
     await prefs.remove('userEmail');
     await prefs.remove('accessToken');
     await prefs.remove('refreshToken');
+    await prefs.remove('accessTokenExpiresAt');
+    await prefs.remove('refreshTokenExpiresAt');
   }
 
   /// Login con el backend real
@@ -192,6 +253,8 @@ class AuthNotifier extends Notifier<AuthState> {
         userEmail: response.user.email,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
+        accessTokenExpiresAt: response.accessTokenExpiresAt,
+        refreshTokenExpiresAt: response.refreshTokenExpiresAt,
       );
 
       state = state.copyWith(
@@ -201,6 +264,8 @@ class AuthNotifier extends Notifier<AuthState> {
         userEmail: response.user.email,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
+        accessTokenExpiresAt: response.accessTokenExpiresAt,
+        refreshTokenExpiresAt: response.refreshTokenExpiresAt,
       );
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
@@ -213,12 +278,12 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   /// Registro con el backend real
-  Future<void> register(String name, String email, String password) async {
+  Future<void> register(String username, String email, String password) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
       final response = await _authService.register(
-        name: name,
+        username: username,
         email: email,
         password: password,
       );
@@ -229,6 +294,8 @@ class AuthNotifier extends Notifier<AuthState> {
         userEmail: response.user.email,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
+        accessTokenExpiresAt: response.accessTokenExpiresAt,
+        refreshTokenExpiresAt: response.refreshTokenExpiresAt,
       );
 
       state = state.copyWith(
@@ -238,6 +305,8 @@ class AuthNotifier extends Notifier<AuthState> {
         userEmail: response.user.email,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
+        accessTokenExpiresAt: response.accessTokenExpiresAt,
+        refreshTokenExpiresAt: response.refreshTokenExpiresAt,
       );
     } on AuthException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.message);
@@ -277,11 +346,15 @@ class AuthNotifier extends Notifier<AuthState> {
         userEmail: state.userEmail,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
+        accessTokenExpiresAt: response.accessTokenExpiresAt,
+        refreshTokenExpiresAt: response.refreshTokenExpiresAt,
       );
 
       state = state.copyWith(
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
+        accessTokenExpiresAt: response.accessTokenExpiresAt,
+        refreshTokenExpiresAt: response.refreshTokenExpiresAt,
       );
 
       debugPrint('[AuthProvider] ✅ Tokens refrescados exitosamente');
@@ -302,3 +375,27 @@ class AuthNotifier extends Notifier<AuthState> {
 final authProvider = NotifierProvider<AuthNotifier, AuthState>(
   AuthNotifier.new,
 );
+
+/// Provider para acceder al interceptor HTTP con auto-refresh de tokens
+///
+/// Este provider crea un AuthInterceptor que:
+/// - Se actualiza automáticamente cuando cambian los tokens
+/// - Usa callbacks para refrescar tokens cuando expiran
+/// - Obtiene el access token actual del estado de autenticación
+final authInterceptorProvider = Provider<AuthInterceptor>((ref) {
+  // Obtener el notifier para acceder a los métodos
+  final notifier = ref.watch(authProvider.notifier);
+
+  // Obtener el estado actual para reaccionar a cambios de tokens
+  final authState = ref.watch(authProvider);
+
+  // Crear el interceptor con los callbacks necesarios
+  return AuthInterceptor(
+    refreshTokenCallback: () async {
+      return await notifier.refreshTokens();
+    },
+    getAccessTokenCallback: () {
+      return authState.accessToken;
+    },
+  );
+});

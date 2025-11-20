@@ -80,8 +80,15 @@
   "specifications": "Specifications",
   "addedToFavorites": "Added to favorites ❤️",
   "removedFromFavorites": "Removed from favorites",
+  "inFavorites": "In favorites",
+  "addToFavorites": "Add to favorites",
+  "mustLoginToAddFavorites": "You must log in to add favorites",
+  "errorLoadingImage": "Error loading image",
   "color": "Color",
   "dimensions": "Dimensions",
+  "model3D": "3D Model",
+  "onlyFavorites": "Only Favorites",
+  "clearAllFilters": "Clear all filters",
   
   "profileTooltip": "Profile",
   "settingsTooltip": "Settings",
@@ -197,5 +204,104 @@
   "more": "More",
   "less": "Less",
   "viewAll": "View All",
-  "viewLess": "View Less"
+  "viewLess": "View Less",
+  
+  "searchProducts": "Search products...",
+  "noColorsAvailable": "No colors available",
+  "seeMore": "See more",
+  "seeLess": "See less",
+  "moreColors": "more",
+  "priceRangeLabel": "Price Range",
+  "minimum": "Minimum",
+  "maximum": "Maximum",
+  "characteristicsLabel": "Characteristics",
+  "hasModel3D": "Has 3D model",
+  "viewARProducts": "View products with AR visualization",
+  "onlyMyFavorites": "Only my favorites",
+  "showOnlyFavoriteProducts": "Show only favorite products",
+  "sortByLabel": "Sort by",
+  "selectOrder": "Select order",
+  "noSort": "No sort",
+  "sortByName": "Name",
+  "sortByPrice": "Price",
+  "sortByPopularity": "Popularity",
+  "sortByNewestFirst": "Most recent",
+  "ascending": "Ascending",
+  "descending": "Descending",
+  "clearAllButton": "Clear",
+  "applyFiltersButton": "Apply Filters",
+  "errorLoadingColors": "Error loading colors: {error}",
+  "@errorLoadingColors": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "noProductsAvailable": "No products available 🛍️",
+  "errorLoading": "Error loading",
+  "clearFiltersTooltip": "Clear filters",
+  
+  "unexpectedError": "Unexpected error",
+  "invalidCredentialsError": "Invalid credentials",
+  "emailOrPasswordIncorrect": "Email or password incorrect",
+  "loginError": "Login error",
+  "connectionToServerError": "Connection error to server. Check that backend is running.",
+  "emailOrUsernameAlreadyInUse": "Email or username is already in use",
+  "validationError": "Validation error",
+  "registrationErrorMessage": "Error registering",
+  "sessionExpiredRefresh": "Session expired. Please log in again.",
+  "errorRefreshingSession": "Error refreshing session",
+  "connectionErrorRefreshing": "Connection error while refreshing session",
+  
+  "unexpectedResponseFormat": "Unexpected response format",
+  "errorGettingProducts": "Error getting products",
+  "connectionErrorProducts": "Connection error",
+  "productNotFound": "Product not found",
+  "errorGettingProduct": "Error getting product",
+  "errorGettingProductsByCategory": "Error getting products by category",
+  "errorSearchingProducts": "Error searching products",
+  
+  "errorGettingCart": "Error getting cart",
+  "errorAddingToCart": "Error adding to cart",
+  "itemNotFoundInCart": "Item not found in cart",
+  "errorUpdatingCart": "Error updating cart",
+  "errorRemovingFromCart": "Error removing from cart",
+  "errorClearingCart": "Error clearing cart",
+  
+  "notAuthenticated": "Not authenticated",
+  "errorGettingFavorites": "Error getting favorites",
+  "unauthorized": "Unauthorized",
+  "productAlreadyInFavorites": "Product already in favorites",
+  "errorAddingToFavorites": "Error adding to favorites",
+  "favoriteNotFound": "Favorite not found",
+  "errorRemovingFromFavorites": "Error removing from favorites",
+  "productNotFoundInFavorites": "Product not found in favorites",
+  
+  "errorGettingCategories": "Error getting categories",
+  "errorGettingCategoriesConnection": "Connection error",
+  
+  "bearerToken": "Bearer {token}",
+  "@bearerToken": {
+    "placeholders": {
+      "token": {
+        "type": "String"
+      }
+    }
+  },
+  "requestTypeNotSupported": "Request type not supported",
+  
+  "viewWidgetCatalog": "View general widgets catalog",
+  "errorDisplay": "Error: {error}",
+  "@errorDisplay": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "areYouSureLogout": "Are you sure you want to logout?",
+  "loginToSeeProfileAndOrders": "Login to see your profile and orders"
 }

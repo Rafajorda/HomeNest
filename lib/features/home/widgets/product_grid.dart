@@ -2,16 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_1/core/models/product.dart';
 import 'package:proyecto_1/core/widgets/products/card_product.dart';
 import 'package:proyecto_1/core/config/api_config.dart';
+import 'package:proyecto_1/core/extensions/context_localization.dart';
 
 class ProductGrid extends StatelessWidget {
   final List<Product> products;
+  final Set<String>? favoriteProductIds;
+  final VoidCallback? onProductReturn;
 
-  const ProductGrid({super.key, required this.products});
+  const ProductGrid({
+    super.key,
+    required this.products,
+    this.favoriteProductIds,
+    this.onProductReturn,
+  });
 
   @override
   Widget build(BuildContext context) {
     if (products.isEmpty) {
-      return const Center(child: Text('No hay productos disponibles 🛍️'));
+      return Center(child: Text(context.loc!.noProductsAvailable));
     }
 
     return LayoutBuilder(
@@ -56,6 +64,8 @@ class ProductGrid extends StatelessWidget {
                 price: product.price,
                 imageUrl: imageUrl,
                 product: product,
+                isFavorite: favoriteProductIds?.contains(product.id) ?? false,
+                onReturn: onProductReturn,
               );
             },
           ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:proyecto_1/core/models/product_filters.dart';
 import 'package:proyecto_1/core/models/color.dart';
 import 'package:proyecto_1/core/services/color_service.dart';
+import 'package:proyecto_1/providers/auth_provider.dart';
+import 'package:proyecto_1/core/extensions/context_localization.dart';
 
 /// Diálogo de filtros de productos.
 ///
@@ -10,6 +13,7 @@ import 'package:proyecto_1/core/services/color_service.dart';
 /// - Rango de precio (mínimo y máximo)
 /// - Color (carga dinámica desde backend)
 /// - Disponibilidad de modelo 3D
+/// - Solo favoritos (solo si está autenticado)
 /// - Estado del producto (activo/inactivo)
 /// - Ordenamiento (por nombre, precio, popularidad, fecha)
 /// - Orden ascendente/descendente
@@ -19,16 +23,18 @@ import 'package:proyecto_1/core/services/color_service.dart';
 /// - Opción "Ver más" para expandir lista de colores (muestra 6 inicialmente)
 /// - Validación de rangos de precio
 /// - Preserva filtros aplicados previamente
-class ProductFiltersDialog extends StatefulWidget {
+/// - Filtro de favoritos solo visible para usuarios autenticados
+class ProductFiltersDialog extends ConsumerStatefulWidget {
   final ProductFilters initialFilters;
 
   const ProductFiltersDialog({super.key, required this.initialFilters});
 
   @override
-  State<ProductFiltersDialog> createState() => _ProductFiltersDialogState();
+  ConsumerState<ProductFiltersDialog> createState() =>
+      _ProductFiltersDialogState();
 }
 
-class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
+class _ProductFiltersDialogState extends ConsumerState<ProductFiltersDialog> {
   // Controladores de texto para los campos de entrada
   late TextEditingController _searchController;
   late TextEditingController _minPriceController;
@@ -40,6 +46,7 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
   bool _isLoadingColors = true; // Indica si está cargando colores
   bool _showAllColors = false; // Controla si mostrar todos los colores o solo 6
   bool? _hasModel3D;
+  bool _onlyFavorites = false; // Mostrar solo favoritos
   String? _selectedStatus;
   String? _selectedSortBy;
   String? _selectedOrder;
@@ -47,18 +54,10 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
   ColorService? _colorService;
 
   // Opciones de ordenamiento
-  final Map<String, String> _sortOptions = {
-    'name': 'Nombre',
-    'price': 'Precio',
-    'favoritesCount': 'Popularidad',
-    'createdAt': 'Más recientes',
-  };
+  final Map<String, String> _sortOptions = {};
 
   // Opciones de orden
-  final Map<String, String> _orderOptions = {
-    'ASC': 'Ascendente',
-    'DESC': 'Descendente',
-  };
+  final Map<String, String> _orderOptions = {};
 
   @override
   void initState() {
@@ -78,12 +77,30 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
     // Inicializar estado de filtros
     _selectedColorId = widget.initialFilters.colorId;
     _hasModel3D = widget.initialFilters.hasModel3D;
+    _onlyFavorites = widget.initialFilters.onlyFavorites ?? false;
     _selectedStatus = widget.initialFilters.status ?? 'active';
     _selectedSortBy = widget.initialFilters.sortBy;
     _selectedOrder = widget.initialFilters.order;
 
     // Cargar colores desde el backend de forma asíncrona
     _loadColors();
+  }
+
+  // Build sort and order options with localization
+  void _buildLocalizedOptions(BuildContext context) {
+    _sortOptions.clear();
+    _sortOptions.addAll({
+      'name': context.loc!.sortByName,
+      'price': context.loc!.sortByPrice,
+      'favoritesCount': context.loc!.sortByPopularity,
+      'createdAt': context.loc!.sortByNewestFirst,
+    });
+
+    _orderOptions.clear();
+    _orderOptions.addAll({
+      'ASC': context.loc!.ascending,
+      'DESC': context.loc!.descending,
+    });
   }
 
   /// Carga los colores disponibles desde el backend.
@@ -110,9 +127,11 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
       }
       // Mostrar error al usuario
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al cargar colores: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(context.loc!.errorLoadingColors(e.toString())),
+          ),
+        );
       }
     }
   }
@@ -139,6 +158,7 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
           ? null
           : double.tryParse(_maxPriceController.text.trim()),
       hasModel3D: _hasModel3D,
+      onlyFavorites: _onlyFavorites ? true : null,
       status: _selectedStatus,
       sortBy: _selectedSortBy,
       order: _selectedOrder,
@@ -154,6 +174,7 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
       _maxPriceController.clear();
       _selectedColorId = null; // Limpiar colorId
       _hasModel3D = null;
+      _onlyFavorites = false;
       _selectedStatus = 'active';
       _selectedSortBy = null;
       _selectedOrder = null;
@@ -176,6 +197,7 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    _buildLocalizedOptions(context); // Build localized options
 
     return Dialog(
       insetPadding: const EdgeInsets.all(16),
@@ -202,7 +224,7 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Filtros',
+                    context.loc!.filters,
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: theme.colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.bold,
@@ -225,20 +247,20 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Búsqueda
-                    _buildSectionTitle('Búsqueda', Icons.search),
+                    _buildSectionTitle(context.loc!.search, Icons.search),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _searchController,
-                      decoration: const InputDecoration(
-                        hintText: 'Buscar productos...',
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText: context.loc!.searchProducts,
+                        prefixIcon: const Icon(Icons.search),
+                        border: const OutlineInputBorder(),
                       ),
                     ),
                     const SizedBox(height: 24),
 
                     // Color
-                    _buildSectionTitle('Color', Icons.palette),
+                    _buildSectionTitle(context.loc!.colorLabel, Icons.palette),
                     const SizedBox(height: 8),
                     _isLoadingColors
                         ? const Center(
@@ -248,11 +270,11 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                             ),
                           )
                         : _availableColors.isEmpty
-                        ? const Padding(
-                            padding: EdgeInsets.all(16.0),
+                        ? Padding(
+                            padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              'No hay colores disponibles',
-                              style: TextStyle(
+                              context.loc!.noColorsAvailable,
+                              style: const TextStyle(
                                 fontStyle: FontStyle.italic,
                                 color: Colors.grey,
                               ),
@@ -309,8 +331,8 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                                   ),
                                   label: Text(
                                     _showAllColors
-                                        ? 'Ver menos'
-                                        : 'Ver más (${_availableColors.length - 6} más)',
+                                        ? context.loc!.seeLess
+                                        : '${context.loc!.seeMore} (${_availableColors.length - 6} ${context.loc!.moreColors})',
                                   ),
                                 ),
                               ],
@@ -319,7 +341,10 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                     const SizedBox(height: 24),
 
                     // Rango de precio
-                    _buildSectionTitle('Rango de Precio', Icons.attach_money),
+                    _buildSectionTitle(
+                      context.loc!.priceRangeLabel,
+                      Icons.attach_money,
+                    ),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -327,10 +352,10 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                           child: TextField(
                             controller: _minPriceController,
                             keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Mínimo',
+                            decoration: InputDecoration(
+                              labelText: context.loc!.minimum,
                               prefixText: '€ ',
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
@@ -339,10 +364,10 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                           child: TextField(
                             controller: _maxPriceController,
                             keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Máximo',
+                            decoration: InputDecoration(
+                              labelText: context.loc!.maximum,
                               prefixText: '€ ',
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                         ),
@@ -351,13 +376,14 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                     const SizedBox(height: 24),
 
                     // Modelo 3D
-                    _buildSectionTitle('Características', Icons.view_in_ar),
+                    _buildSectionTitle(
+                      context.loc!.characteristicsLabel,
+                      Icons.view_in_ar,
+                    ),
                     const SizedBox(height: 8),
                     CheckboxListTile(
-                      title: const Text('Tiene modelo 3D'),
-                      subtitle: const Text(
-                        'Ver productos con visualización AR',
-                      ),
+                      title: Text(context.loc!.hasModel3D),
+                      subtitle: Text(context.loc!.viewARProducts),
                       value: _hasModel3D,
                       tristate: true,
                       onChanged: (value) {
@@ -367,22 +393,38 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                       },
                       secondary: const Icon(Icons.view_in_ar),
                     ),
+                    // Solo mostrar filtro de favoritos si el usuario está autenticado
+                    if (ref.watch(authProvider).isAuthenticated)
+                      SwitchListTile(
+                        title: Text(context.loc!.onlyMyFavorites),
+                        subtitle: Text(context.loc!.showOnlyFavoriteProducts),
+                        value: _onlyFavorites,
+                        onChanged: (value) {
+                          setState(() {
+                            _onlyFavorites = value;
+                          });
+                        },
+                        secondary: const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                        ),
+                      ),
                     const SizedBox(height: 24),
 
                     // Ordenamiento
-                    _buildSectionTitle('Ordenar por', Icons.sort),
+                    _buildSectionTitle(context.loc!.sortByLabel, Icons.sort),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       initialValue: _selectedSortBy,
-                      decoration: const InputDecoration(
-                        hintText: 'Seleccionar orden',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.sort),
+                      decoration: InputDecoration(
+                        hintText: context.loc!.selectOrder,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.sort),
                       ),
                       items: [
-                        const DropdownMenuItem(
+                        DropdownMenuItem(
                           value: null,
-                          child: Text('Sin ordenar'),
+                          child: Text(context.loc!.noSort),
                         ),
                         ..._sortOptions.entries.map((entry) {
                           return DropdownMenuItem(
@@ -441,7 +483,7 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                     child: OutlinedButton.icon(
                       onPressed: _clearFilters,
                       icon: const Icon(Icons.clear_all),
-                      label: const Text('Limpiar'),
+                      label: Text(context.loc!.clearAllButton),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -451,7 +493,7 @@ class _ProductFiltersDialogState extends State<ProductFiltersDialog> {
                     child: FilledButton.icon(
                       onPressed: _applyFilters,
                       icon: const Icon(Icons.check),
-                      label: const Text('Aplicar Filtros'),
+                      label: Text(context.loc!.applyFiltersButton),
                     ),
                   ),
                 ],

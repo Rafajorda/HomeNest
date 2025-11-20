@@ -151,6 +151,7 @@ class ProfilePage extends ConsumerWidget {
                     context.loc?.logoutConfirmMessage(
                           authState.userName ?? context.loc?.user ?? 'User',
                         ) ??
+                        context.loc?.areYouSureLogout ??
                         'Are you sure you want to logout?',
                   ),
                   actions: [
@@ -209,7 +210,7 @@ class ProfilePage extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              context.loc?.loginToSeeProfile ??
+              context.loc?.loginToSeeProfileAndOrders ??
                   'Login to see your profile and orders',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),

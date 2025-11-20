@@ -9,6 +9,7 @@ class ProductFilters {
   final String? status; // "active", "inactive", "all"
   final String? sortBy; // "name", "price", "favoritesCount", "createdAt"
   final String? order; // "ASC", "DESC"
+  final bool? onlyFavorites; // Filtro para mostrar solo favoritos del usuario
   final int? limit;
   final int? offset;
 
@@ -22,6 +23,7 @@ class ProductFilters {
     this.status,
     this.sortBy,
     this.order,
+    this.onlyFavorites,
     this.limit,
     this.offset,
   });
@@ -37,6 +39,7 @@ class ProductFilters {
     String? status,
     String? sortBy,
     String? order,
+    bool? onlyFavorites,
     int? limit,
     int? offset,
     bool clearSearch = false,
@@ -48,6 +51,7 @@ class ProductFilters {
     bool clearStatus = false,
     bool clearSortBy = false,
     bool clearOrder = false,
+    bool clearOnlyFavorites = false,
   }) {
     return ProductFilters(
       search: clearSearch ? null : (search ?? this.search),
@@ -59,6 +63,9 @@ class ProductFilters {
       status: clearStatus ? null : (status ?? this.status),
       sortBy: clearSortBy ? null : (sortBy ?? this.sortBy),
       order: clearOrder ? null : (order ?? this.order),
+      onlyFavorites: clearOnlyFavorites
+          ? null
+          : (onlyFavorites ?? this.onlyFavorites),
       limit: limit ?? this.limit,
       offset: offset ?? this.offset,
     );
@@ -112,6 +119,7 @@ class ProductFilters {
       minPrice != null ||
       maxPrice != null ||
       hasModel3D != null ||
+      onlyFavorites == true ||
       status != null ||
       sortBy != null;
 
@@ -122,6 +130,7 @@ class ProductFilters {
     if (colorId != null && colorId!.isNotEmpty) count++;
     if (minPrice != null || maxPrice != null) count++;
     if (hasModel3D != null) count++;
+    if (onlyFavorites == true) count++;
     if (status != null && status != 'active') count++; // 'active' es default
     if (sortBy != null && sortBy!.isNotEmpty) count++;
     return count;
@@ -134,7 +143,8 @@ class ProductFilters {
   String toString() {
     return 'ProductFilters(search: $search, categoryId: $categoryId, '
         'colorId: $colorId, minPrice: $minPrice, maxPrice: $maxPrice, '
-        'hasModel3D: $hasModel3D, status: $status, sortBy: $sortBy, '
+        'hasModel3D: $hasModel3D, onlyFavorites: $onlyFavorites, '
+        'status: $status, sortBy: $sortBy, '
         'order: $order, limit: $limit, offset: $offset)';
   }
 
@@ -149,6 +159,7 @@ class ProductFilters {
         other.minPrice == minPrice &&
         other.maxPrice == maxPrice &&
         other.hasModel3D == hasModel3D &&
+        other.onlyFavorites == onlyFavorites &&
         other.status == status &&
         other.sortBy == sortBy &&
         other.order == order &&
@@ -165,6 +176,7 @@ class ProductFilters {
       minPrice,
       maxPrice,
       hasModel3D,
+      onlyFavorites,
       status,
       sortBy,
       order,

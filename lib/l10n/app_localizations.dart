@@ -425,6 +425,30 @@ abstract class AppLocalizations {
   /// **'Removed from favorites'**
   String get removedFromFavorites;
 
+  /// No description provided for @inFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'In favorites'**
+  String get inFavorites;
+
+  /// No description provided for @addToFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favorites'**
+  String get addToFavorites;
+
+  /// No description provided for @mustLoginToAddFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'You must log in to add favorites'**
+  String get mustLoginToAddFavorites;
+
+  /// No description provided for @errorLoadingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading image'**
+  String get errorLoadingImage;
+
   /// No description provided for @color.
   ///
   /// In en, this message translates to:
@@ -436,6 +460,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Dimensions'**
   String get dimensions;
+
+  /// No description provided for @model3D.
+  ///
+  /// In en, this message translates to:
+  /// **'3D Model'**
+  String get model3D;
+
+  /// No description provided for @onlyFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Only Favorites'**
+  String get onlyFavorites;
+
+  /// No description provided for @clearAllFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all filters'**
+  String get clearAllFilters;
 
   /// No description provided for @profileTooltip.
   ///
@@ -952,6 +994,402 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View Less'**
   String get viewLess;
+
+  /// No description provided for @noColorsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No colors available'**
+  String get noColorsAvailable;
+
+  /// No description provided for @seeMore.
+  ///
+  /// In en, this message translates to:
+  /// **'See more'**
+  String get seeMore;
+
+  /// No description provided for @seeLess.
+  ///
+  /// In en, this message translates to:
+  /// **'See less'**
+  String get seeLess;
+
+  /// No description provided for @moreColors.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get moreColors;
+
+  /// No description provided for @priceRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Price Range'**
+  String get priceRangeLabel;
+
+  /// No description provided for @minimum.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum'**
+  String get minimum;
+
+  /// No description provided for @maximum.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum'**
+  String get maximum;
+
+  /// No description provided for @characteristicsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Characteristics'**
+  String get characteristicsLabel;
+
+  /// No description provided for @hasModel3D.
+  ///
+  /// In en, this message translates to:
+  /// **'Has 3D model'**
+  String get hasModel3D;
+
+  /// No description provided for @viewARProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'View products with AR visualization'**
+  String get viewARProducts;
+
+  /// No description provided for @onlyMyFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Only my favorites'**
+  String get onlyMyFavorites;
+
+  /// No description provided for @showOnlyFavoriteProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Show only favorite products'**
+  String get showOnlyFavoriteProducts;
+
+  /// No description provided for @sortByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get sortByLabel;
+
+  /// No description provided for @selectOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select order'**
+  String get selectOrder;
+
+  /// No description provided for @noSort.
+  ///
+  /// In en, this message translates to:
+  /// **'No sort'**
+  String get noSort;
+
+  /// No description provided for @sortByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get sortByName;
+
+  /// No description provided for @sortByPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get sortByPrice;
+
+  /// No description provided for @sortByNewestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Most recent'**
+  String get sortByNewestFirst;
+
+  /// No description provided for @ascending.
+  ///
+  /// In en, this message translates to:
+  /// **'Ascending'**
+  String get ascending;
+
+  /// No description provided for @descending.
+  ///
+  /// In en, this message translates to:
+  /// **'Descending'**
+  String get descending;
+
+  /// No description provided for @clearAllButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearAllButton;
+
+  /// No description provided for @applyFiltersButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply Filters'**
+  String get applyFiltersButton;
+
+  /// No description provided for @errorLoadingColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading colors: {error}'**
+  String errorLoadingColors(String error);
+
+  /// No description provided for @noProductsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No products available 🛍️'**
+  String get noProductsAvailable;
+
+  /// No description provided for @errorLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading'**
+  String get errorLoading;
+
+  /// No description provided for @clearFiltersTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get clearFiltersTooltip;
+
+  /// No description provided for @unexpectedError.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected error'**
+  String get unexpectedError;
+
+  /// No description provided for @invalidCredentialsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid credentials'**
+  String get invalidCredentialsError;
+
+  /// No description provided for @emailOrPasswordIncorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or password incorrect'**
+  String get emailOrPasswordIncorrect;
+
+  /// No description provided for @loginError.
+  ///
+  /// In en, this message translates to:
+  /// **'Login error'**
+  String get loginError;
+
+  /// No description provided for @connectionToServerError.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection error to server. Check that backend is running.'**
+  String get connectionToServerError;
+
+  /// No description provided for @emailOrUsernameAlreadyInUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Email or username is already in use'**
+  String get emailOrUsernameAlreadyInUse;
+
+  /// No description provided for @validationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Validation error'**
+  String get validationError;
+
+  /// No description provided for @registrationErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error registering'**
+  String get registrationErrorMessage;
+
+  /// No description provided for @sessionExpiredRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired. Please log in again.'**
+  String get sessionExpiredRefresh;
+
+  /// No description provided for @errorRefreshingSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Error refreshing session'**
+  String get errorRefreshingSession;
+
+  /// No description provided for @connectionErrorRefreshing.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection error while refreshing session'**
+  String get connectionErrorRefreshing;
+
+  /// No description provided for @unexpectedResponseFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected response format'**
+  String get unexpectedResponseFormat;
+
+  /// No description provided for @errorGettingProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting products'**
+  String get errorGettingProducts;
+
+  /// No description provided for @connectionErrorProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection error'**
+  String get connectionErrorProducts;
+
+  /// No description provided for @productNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Product not found'**
+  String get productNotFound;
+
+  /// No description provided for @errorGettingProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting product'**
+  String get errorGettingProduct;
+
+  /// No description provided for @errorGettingProductsByCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting products by category'**
+  String get errorGettingProductsByCategory;
+
+  /// No description provided for @errorSearchingProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Error searching products'**
+  String get errorSearchingProducts;
+
+  /// No description provided for @errorGettingCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting cart'**
+  String get errorGettingCart;
+
+  /// No description provided for @errorAddingToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Error adding to cart'**
+  String get errorAddingToCart;
+
+  /// No description provided for @itemNotFoundInCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Item not found in cart'**
+  String get itemNotFoundInCart;
+
+  /// No description provided for @errorUpdatingCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating cart'**
+  String get errorUpdatingCart;
+
+  /// No description provided for @errorRemovingFromCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Error removing from cart'**
+  String get errorRemovingFromCart;
+
+  /// No description provided for @errorClearingCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Error clearing cart'**
+  String get errorClearingCart;
+
+  /// No description provided for @notAuthenticated.
+  ///
+  /// In en, this message translates to:
+  /// **'Not authenticated'**
+  String get notAuthenticated;
+
+  /// No description provided for @errorGettingFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting favorites'**
+  String get errorGettingFavorites;
+
+  /// No description provided for @unauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Unauthorized'**
+  String get unauthorized;
+
+  /// No description provided for @productAlreadyInFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Product already in favorites'**
+  String get productAlreadyInFavorites;
+
+  /// No description provided for @errorAddingToFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Error adding to favorites'**
+  String get errorAddingToFavorites;
+
+  /// No description provided for @favoriteNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorite not found'**
+  String get favoriteNotFound;
+
+  /// No description provided for @errorRemovingFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Error removing from favorites'**
+  String get errorRemovingFromFavorites;
+
+  /// No description provided for @productNotFoundInFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Product not found in favorites'**
+  String get productNotFoundInFavorites;
+
+  /// No description provided for @errorGettingCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Error getting categories'**
+  String get errorGettingCategories;
+
+  /// No description provided for @errorGettingCategoriesConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection error'**
+  String get errorGettingCategoriesConnection;
+
+  /// No description provided for @bearerToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Bearer {token}'**
+  String bearerToken(String token);
+
+  /// No description provided for @requestTypeNotSupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Request type not supported'**
+  String get requestTypeNotSupported;
+
+  /// No description provided for @viewWidgetCatalog.
+  ///
+  /// In en, this message translates to:
+  /// **'View general widgets catalog'**
+  String get viewWidgetCatalog;
+
+  /// No description provided for @errorDisplay.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String errorDisplay(String error);
+
+  /// No description provided for @areYouSureLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get areYouSureLogout;
+
+  /// No description provided for @loginToSeeProfileAndOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Login to see your profile and orders'**
+  String get loginToSeeProfileAndOrders;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

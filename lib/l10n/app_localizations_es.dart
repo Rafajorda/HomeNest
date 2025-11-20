@@ -178,10 +178,31 @@ class AppLocalizationsEs extends AppLocalizations {
   String get removedFromFavorites => 'Eliminado de favoritos';
 
   @override
+  String get inFavorites => 'En favoritos';
+
+  @override
+  String get addToFavorites => 'Añadir a favoritos';
+
+  @override
+  String get mustLoginToAddFavorites => 'Debes iniciar sesión para añadir favoritos';
+
+  @override
+  String get errorLoadingImage => 'Error al cargar imagen';
+
+  @override
   String get color => 'Color';
 
   @override
   String get dimensions => 'Dimensiones';
+
+  @override
+  String get model3D => 'Modelo 3D';
+
+  @override
+  String get onlyFavorites => 'Solo Favoritos';
+
+  @override
+  String get clearAllFilters => 'Limpiar todos los filtros';
 
   @override
   String get profileTooltip => 'Perfil';
@@ -446,4 +467,208 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get viewLess => 'Ver Menos';
+
+  @override
+  String get noColorsAvailable => 'No hay colores disponibles';
+
+  @override
+  String get seeMore => 'Ver más';
+
+  @override
+  String get seeLess => 'Ver menos';
+
+  @override
+  String get moreColors => 'más';
+
+  @override
+  String get priceRangeLabel => 'Rango de Precio';
+
+  @override
+  String get minimum => 'Mínimo';
+
+  @override
+  String get maximum => 'Máximo';
+
+  @override
+  String get characteristicsLabel => 'Características';
+
+  @override
+  String get hasModel3D => 'Tiene modelo 3D';
+
+  @override
+  String get viewARProducts => 'Ver productos con visualización AR';
+
+  @override
+  String get onlyMyFavorites => 'Solo mis favoritos';
+
+  @override
+  String get showOnlyFavoriteProducts => 'Mostrar únicamente productos favoritos';
+
+  @override
+  String get sortByLabel => 'Ordenar por';
+
+  @override
+  String get selectOrder => 'Seleccionar orden';
+
+  @override
+  String get noSort => 'Sin ordenar';
+
+  @override
+  String get sortByName => 'Nombre';
+
+  @override
+  String get sortByPrice => 'Precio';
+
+  @override
+  String get sortByNewestFirst => 'Más recientes';
+
+  @override
+  String get ascending => 'Ascendente';
+
+  @override
+  String get descending => 'Descendente';
+
+  @override
+  String get clearAllButton => 'Limpiar';
+
+  @override
+  String get applyFiltersButton => 'Aplicar Filtros';
+
+  @override
+  String errorLoadingColors(String error) {
+    return 'Error al cargar colores: $error';
+  }
+
+  @override
+  String get noProductsAvailable => 'No hay productos disponibles 🛍️';
+
+  @override
+  String get errorLoading => 'Error al cargar';
+
+  @override
+  String get clearFiltersTooltip => 'Limpiar filtros';
+
+  @override
+  String get unexpectedError => 'Error inesperado';
+
+  @override
+  String get invalidCredentialsError => 'Credenciales inválidas';
+
+  @override
+  String get emailOrPasswordIncorrect => 'Email o contraseña incorrectos';
+
+  @override
+  String get loginError => 'Error al iniciar sesión';
+
+  @override
+  String get connectionToServerError => 'Error de conexión al servidor. Verifica que el backend esté corriendo.';
+
+  @override
+  String get emailOrUsernameAlreadyInUse => 'El email o nombre de usuario ya está en uso';
+
+  @override
+  String get validationError => 'Error de validación';
+
+  @override
+  String get registrationErrorMessage => 'Error al registrarse';
+
+  @override
+  String get sessionExpiredRefresh => 'Sesión expirada. Por favor, inicia sesión nuevamente.';
+
+  @override
+  String get errorRefreshingSession => 'Error al refrescar la sesión';
+
+  @override
+  String get connectionErrorRefreshing => 'Error de conexión al refrescar la sesión';
+
+  @override
+  String get unexpectedResponseFormat => 'Formato de respuesta inesperado';
+
+  @override
+  String get errorGettingProducts => 'Error al obtener productos';
+
+  @override
+  String get connectionErrorProducts => 'Error de conexión';
+
+  @override
+  String get productNotFound => 'Producto no encontrado';
+
+  @override
+  String get errorGettingProduct => 'Error al obtener producto';
+
+  @override
+  String get errorGettingProductsByCategory => 'Error al obtener productos por categoría';
+
+  @override
+  String get errorSearchingProducts => 'Error al buscar productos';
+
+  @override
+  String get errorGettingCart => 'Error al obtener carrito';
+
+  @override
+  String get errorAddingToCart => 'Error al añadir al carrito';
+
+  @override
+  String get itemNotFoundInCart => 'Item no encontrado en el carrito';
+
+  @override
+  String get errorUpdatingCart => 'Error al actualizar carrito';
+
+  @override
+  String get errorRemovingFromCart => 'Error al eliminar del carrito';
+
+  @override
+  String get errorClearingCart => 'Error al vaciar carrito';
+
+  @override
+  String get notAuthenticated => 'No autenticado';
+
+  @override
+  String get errorGettingFavorites => 'Error al obtener favoritos';
+
+  @override
+  String get unauthorized => 'No autorizado';
+
+  @override
+  String get productAlreadyInFavorites => 'El producto ya está en favoritos';
+
+  @override
+  String get errorAddingToFavorites => 'Error al añadir a favoritos';
+
+  @override
+  String get favoriteNotFound => 'Favorito no encontrado';
+
+  @override
+  String get errorRemovingFromFavorites => 'Error al eliminar de favoritos';
+
+  @override
+  String get productNotFoundInFavorites => 'Producto no encontrado en favoritos';
+
+  @override
+  String get errorGettingCategories => 'Error al obtener categorías';
+
+  @override
+  String get errorGettingCategoriesConnection => 'Error de conexión';
+
+  @override
+  String bearerToken(String token) {
+    return 'Bearer $token';
+  }
+
+  @override
+  String get requestTypeNotSupported => 'Tipo de solicitud no soportado';
+
+  @override
+  String get viewWidgetCatalog => 'Ver catálogo de widgets generales';
+
+  @override
+  String errorDisplay(String error) {
+    return 'Error: $error';
+  }
+
+  @override
+  String get areYouSureLogout => '¿Estás seguro de que quieres cerrar sesión?';
+
+  @override
+  String get loginToSeeProfileAndOrders => 'Inicia sesión para ver tu perfil y pedidos';
 }
