@@ -1,7 +1,5 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import '../config/api_config.dart';
-import '../utils/service_messages.dart';
+import '../data/repositories/auth_repository.dart';
+import '../data/datasources/remote/auth_remote_datasource.dart';
 
 /// Excepciones personalizadas para el servicio de autenticación
 class AuthException implements Exception {
@@ -19,10 +17,10 @@ class LoginResponse {
   final String accessToken;
   final String refreshToken;
   final UserData user;
-  final int? expiresIn; // Segundos hasta expiración del access token
-  final String? tokenType; // "Bearer"
-  final int? accessTokenExpiresAt; // Timestamp en milisegundos
-  final int? refreshTokenExpiresAt; // Timestamp en milisegundos
+  final int? expiresIn;
+  final String? tokenType;
+  final int? accessTokenExpiresAt;
+  final int? refreshTokenExpiresAt;
 
   LoginResponse({
     required this.accessToken,
@@ -53,8 +51,8 @@ class RefreshTokenResponse {
   final String refreshToken;
   final int expiresIn;
   final String tokenType;
-  final int? accessTokenExpiresAt; // Timestamp en milisegundos
-  final int? refreshTokenExpiresAt; // Timestamp en milisegundos
+  final int? accessTokenExpiresAt;
+  final int? refreshTokenExpiresAt;
 
   RefreshTokenResponse({
     required this.accessToken,
@@ -69,7 +67,7 @@ class RefreshTokenResponse {
     return RefreshTokenResponse(
       accessToken: json['access_token'] ?? '',
       refreshToken: json['refresh_token'] ?? '',
-      expiresIn: json['expires_in'] ?? 900, // Default 15 minutos
+      expiresIn: json['expires_in'] ?? 900,
       tokenType: json['token_type'] ?? 'Bearer',
       accessTokenExpiresAt: json['access_token_expires_at'],
       refreshTokenExpiresAt: json['refresh_token_expires_at'],
@@ -106,22 +104,16 @@ class UserData {
     final lastName = json['lastName'] ?? '';
     final username = json['username'] ?? '';
 
-    // Construir el nombre completo
     String displayName;
     if (firstName.isNotEmpty && lastName.isNotEmpty) {
-      // Si ambos están presentes: "Juan Pérez"
       displayName = '$firstName $lastName'.trim();
     } else if (firstName.isNotEmpty) {
-      // Solo firstName: "Juan"
       displayName = firstName;
     } else if (lastName.isNotEmpty) {
-      // Solo lastName: "Pérez"
       displayName = lastName;
     } else if (username.isNotEmpty) {
-      // Si no hay nombre, usar username: "juanperez"
       displayName = username;
     } else {
-      // Último recurso: "User"
       displayName = 'User';
     }
 
@@ -151,79 +143,28 @@ class UserData {
   };
 }
 
-/// Servicio de autenticación - maneja todas las peticiones relacionadas con auth
+/// Servicio de autenticación - Capa de coordinación
+///
+/// Delega toda la lógica de negocio al AuthRepository.
+/// Mantiene los modelos (LoginResponse, UserData, etc.) para uso de la UI.
 class AuthService {
-  final http.Client _client;
+  final AuthRepository _repository;
 
-  AuthService({http.Client? client}) : _client = client ?? http.Client();
+  AuthService() : _repository = AuthRepository(AuthRemoteDataSource());
 
-  /// Login - retorna token y datos de usuario
+  /// Login - Autenticar usuario
   Future<LoginResponse> login({
     required String email,
     required String password,
   }) async {
     try {
-      final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.loginEndpoint}');
-
-      final response = await _client
-          .post(
-            url,
-            headers: ApiConfig.defaultHeaders,
-            body: jsonEncode({'email': email, 'password': password}),
-          )
-          .timeout(ApiConfig.connectionTimeout);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        return LoginResponse.fromJson(data);
-      } else if (response.statusCode == 401) {
-        // Credenciales incorrectas
-        try {
-          final error = jsonDecode(response.body);
-          throw AuthException(
-            error['message'] ?? ServiceMessages.invalidCredentials,
-            statusCode: 401,
-          );
-        } catch (e) {
-          if (e is AuthException) rethrow;
-          throw AuthException(
-            ServiceMessages.invalidCredentials,
-            statusCode: 401,
-          );
-        }
-      } else if (response.statusCode == 400) {
-        try {
-          final error = jsonDecode(response.body);
-          throw AuthException(
-            error['message'] ?? ServiceMessages.emailOrPasswordIncorrect,
-            statusCode: 400,
-          );
-        } catch (e) {
-          if (e is AuthException) rethrow;
-          throw AuthException(
-            ServiceMessages.emailOrPasswordIncorrect,
-            statusCode: 400,
-          );
-        }
-      } else {
-        try {
-          final error = jsonDecode(response.body);
-          throw AuthException(
-            error['message'] ?? ServiceMessages.loginError,
-            statusCode: response.statusCode,
-          );
-        } catch (e) {
-          if (e is AuthException) rethrow;
-          throw AuthException(
-            ServiceMessages.loginError,
-            statusCode: response.statusCode,
-          );
-        }
-      }
-    } on AuthException {
-      rethrow;
+      final data = await _repository.login(email, password);
+      return LoginResponse.fromJson(data);
     } catch (e) {
-      throw AuthException(ServiceMessages.connectionToServerError);
+      if (e is AuthRepositoryException) {
+        throw AuthException(e.message, statusCode: e.statusCode);
+      }
+      rethrow;
     }
   }
 
@@ -234,156 +175,56 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final url = Uri.parse(
-        '${ApiConfig.baseUrl}${ApiConfig.registerEndpoint}',
-      );
-
-      final body = {'username': username, 'email': email, 'password': password};
-
-      final response = await _client
-          .post(url, headers: ApiConfig.defaultHeaders, body: jsonEncode(body))
-          .timeout(ApiConfig.connectionTimeout);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        return LoginResponse.fromJson(data);
-      } else if (response.statusCode == 409) {
-        // Conflicto - email o username ya existen
-        try {
-          final error = jsonDecode(response.body);
-          throw AuthException(
-            error['message'] ?? ServiceMessages.emailOrUsernameInUse,
-            statusCode: 409,
-          );
-        } catch (e) {
-          if (e is AuthException) rethrow;
-          throw AuthException(
-            ServiceMessages.emailOrUsernameInUse,
-            statusCode: 409,
-          );
-        }
-      } else if (response.statusCode == 400) {
-        // Error de validación
-        try {
-          final error = jsonDecode(response.body);
-          final message = error['message'];
-          final errorMsg = message is List
-              ? message.join(', ')
-              : message ?? ServiceMessages.validationError;
-          throw AuthException(errorMsg, statusCode: 400);
-        } catch (e) {
-          if (e is AuthException) rethrow;
-          throw AuthException(ServiceMessages.validationError, statusCode: 400);
-        }
-      } else {
-        try {
-          final error = jsonDecode(response.body);
-          throw AuthException(
-            error['message'] ?? ServiceMessages.registrationError,
-            statusCode: response.statusCode,
-          );
-        } catch (e) {
-          if (e is AuthException) rethrow;
-          throw AuthException(
-            ServiceMessages.registrationError,
-            statusCode: response.statusCode,
-          );
-        }
-      }
-    } on AuthException {
-      rethrow;
+      final data = await _repository.register(email, password, username);
+      return LoginResponse.fromJson(data);
     } catch (e) {
-      throw AuthException(ServiceMessages.connectionToServerError);
+      if (e is AuthRepositoryException) {
+        throw AuthException(e.message, statusCode: e.statusCode);
+      }
+      rethrow;
     }
   }
 
-  /// Refresh tokens - obtiene nuevos access y refresh tokens
+  /// Refresh tokens - Renovar tokens de acceso
   Future<RefreshTokenResponse> refreshTokens(String refreshToken) async {
     try {
-      final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.refreshEndpoint}');
-
-      final response = await _client
-          .post(
-            url,
-            headers: ApiConfig.defaultHeaders,
-            body: jsonEncode({'refresh_token': refreshToken}),
-          )
-          .timeout(ApiConfig.connectionTimeout);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-        return RefreshTokenResponse.fromJson(data);
-      } else if (response.statusCode == 401) {
-        throw AuthException(ServiceMessages.sessionExpired, statusCode: 401);
-      } else {
-        throw AuthException(
-          ServiceMessages.errorRefreshingSession,
-          statusCode: response.statusCode,
-        );
+      final data = await _repository.refreshToken(refreshToken);
+      return RefreshTokenResponse.fromJson(data);
+    } catch (e) {
+      if (e is AuthRepositoryException) {
+        throw AuthException(e.message, statusCode: e.statusCode);
       }
-    } on AuthException {
       rethrow;
-    } catch (e) {
-      throw AuthException(ServiceMessages.connectionErrorRefreshing);
     }
   }
 
-  /// Logout - invalida el refresh token en el servidor
+  /// Logout - Cerrar sesión
   Future<void> logout(String? accessToken, String? refreshToken) async {
+    if (accessToken == null) return;
     try {
-      if (refreshToken == null) return;
-
-      final url = Uri.parse('${ApiConfig.baseUrl}${ApiConfig.logoutEndpoint}');
-
-      final headers = accessToken != null
-          ? ApiConfig.authHeaders(accessToken)
-          : ApiConfig.defaultHeaders;
-
-      await _client
-          .post(
-            url,
-            headers: headers,
-            body: jsonEncode({'refresh_token': refreshToken}),
-          )
-          .timeout(ApiConfig.connectionTimeout);
+      await _repository.logout(accessToken);
     } catch (e) {
-      // Ignoramos errores de logout en el servidor
+      // Ignoramos errores de logout
     }
   }
 
-  /// Logout All - revoca todos los tokens del usuario
+  /// Logout All - Cerrar todas las sesiones (mismo que logout)
   Future<void> logoutAll(String accessToken) async {
     try {
-      final url = Uri.parse(
-        '${ApiConfig.baseUrl}${ApiConfig.logoutAllEndpoint}',
-      );
-
-      await _client
-          .post(url, headers: ApiConfig.authHeaders(accessToken))
-          .timeout(ApiConfig.connectionTimeout);
-      // ignore: empty_catches
-    } catch (e) {}
+      await _repository.logout(accessToken);
+    } catch (e) {
+      // Ignoramos errores
+    }
   }
 
   /// Verifica si un token es válido
   Future<bool> verifyToken(String token) async {
     try {
-      final url = Uri.parse(
-        '${ApiConfig.baseUrl}${ApiConfig.verifyTokenEndpoint}',
-      );
-
-      final response = await _client
-          .get(url, headers: ApiConfig.authHeaders(token))
-          .timeout(ApiConfig.connectionTimeout);
-
-      return response.statusCode == 200;
+      // Intentamos obtener el perfil como verificación
+      await _repository.getUserProfile(token);
+      return true;
     } catch (e) {
       return false;
     }
-  }
-
-  /// Cierra el cliente HTTP
-  void dispose() {
-    _client.close();
   }
 }
