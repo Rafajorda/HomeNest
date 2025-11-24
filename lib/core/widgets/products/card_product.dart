@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_1/features/details/details_product.dart';
+import 'package:proyecto_1/features/details/details_product_page.dart';
 import '../../models/product.dart';
 
 /// Card de producto para mostrar en grids o listas.

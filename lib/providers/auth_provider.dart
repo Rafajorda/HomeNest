@@ -78,11 +78,6 @@ class AuthNotifier extends Notifier<AuthState> {
     // Cargar estado de autenticación al inicializar
     _loadAuthState();
 
-    // Limpiar el servicio cuando el provider se destruya
-    ref.onDispose(() {
-      _authService.dispose();
-    });
-
     return const AuthState();
   } // Cargar el estado guardado
 
