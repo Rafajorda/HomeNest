@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:proyecto_1/core/extensions/context_localization.dart';
-import 'package:proyecto_1/core/widgets/button.dart';
 import 'package:proyecto_1/providers/auth_provider.dart';
 import 'package:proyecto_1/features/home/home_page.dart';
+import 'widgets/widgets.dart';
 
+/// Página de registro de nuevos usuarios
+///
+/// Funcionalidades:
+/// - Formulario con username, email y contraseña
+/// - Validación de campos vacíos
+/// - Integración con AuthProvider (Riverpod)
+/// - Estado de carga durante registro
+/// - Manejo de errores con SnackBar
+/// - Navegación a home tras registro exitoso
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
@@ -25,6 +34,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     super.dispose();
   }
 
+  /// Maneja el proceso de registro
+  ///
+  /// Pasos:
+  /// 1. Obtiene y valida username, email y password
+  /// 2. Llama al método register() del AuthProvider
+  /// 3. Si es exitoso, navega a home eliminando registro/login del stack
+  /// 4. Si hay error, muestra SnackBar rojo con el mensaje
   Future<void> _handleRegister() async {
     final username = usernameController.text.trim();
     final email = emailController.text.trim();
@@ -82,66 +98,47 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
+            // 🔹 CAMPO DE USERNAME
+            AuthTextField(
               controller: usernameController,
+              labelText: 'Username',
+              icon: Icons.person,
               enabled: !authState.isLoading,
-              decoration: InputDecoration(
-                labelText: 'Username',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.person),
-              ),
             ),
             const SizedBox(height: 16),
 
-            TextField(
+            // 🔹 CAMPO DE EMAIL
+            AuthTextField(
               controller: emailController,
+              labelText: context.loc?.email ?? 'Email',
+              icon: Icons.email,
               keyboardType: TextInputType.emailAddress,
               enabled: !authState.isLoading,
-              decoration: InputDecoration(
-                labelText: context.loc?.email ?? 'Email',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.email),
-              ),
             ),
             const SizedBox(height: 16),
 
-            TextField(
+            // 🔹 CAMPO DE CONTRASEÑA
+            AuthTextField(
               controller: passwordController,
+              labelText: context.loc?.password ?? 'Password',
+              icon: Icons.lock,
               obscureText: true,
               enabled: !authState.isLoading,
-              decoration: InputDecoration(
-                labelText: context.loc?.password ?? 'Password',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.lock),
-              ),
               onSubmitted: (_) => _handleRegister(),
             ),
             const SizedBox(height: 24),
 
-            SizedBox(
-              width: double.infinity,
-              child: authState.isLoading
-                  ? ElevatedButton(
-                      onPressed: null,
-                      child: const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
-                  : GeneralButton(
-                      label: context.loc?.register ?? 'Register',
-                      onPressed: _handleRegister,
-                      icon: Icons.person_add,
-                    ),
+            // 🔹 BOTÓN DE REGISTRO
+            AuthButton(
+              label: context.loc?.register ?? 'Register',
+              icon: Icons.person_add,
+              onPressed: _handleRegister,
+              isLoading: authState.isLoading,
             ),
 
             const SizedBox(height: 16),
 
-            // Botón "Cancelar" para volver (siempre visible)
+            // 🔹 BOTÓN CANCELAR
             TextButton(
               onPressed: authState.isLoading
                   ? null

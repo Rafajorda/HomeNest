@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:proyecto_1/core/extensions/context_localization.dart';
-import 'package:proyecto_1/core/widgets/button.dart';
 import 'package:proyecto_1/providers/auth_provider.dart';
 import 'package:proyecto_1/features/login/register_page.dart';
 import 'package:proyecto_1/features/home/home_page.dart';
+import 'widgets/widgets.dart';
 
+/// Página de inicio de sesión (Login)
+///
+/// Funcionalidades:
+/// - Formulario con email y contraseña
+/// - Validación de campos vacíos
+/// - Integración con AuthProvider (Riverpod)
+/// - Navegación a registro
+/// - Estado de carga durante autenticación
+/// - Manejo de errores con SnackBar
+/// - Navegación a home tras login exitoso
+/// - Previene retroceso durante carga (PopScope)
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -14,20 +25,35 @@ class LoginPage extends ConsumerStatefulWidget {
 }
 
 class _LoginPageState extends ConsumerState<LoginPage> {
+  /// Controlador del campo de email
+  /// Se debe liberar en dispose() para evitar memory leaks
   final emailController = TextEditingController();
+
+  /// Controlador del campo de contraseña
+  /// Se debe liberar en dispose() para evitar memory leaks
   final passwordController = TextEditingController();
 
   @override
   void dispose() {
+    // Liberar recursos de los controladores
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
   }
 
+  /// Maneja el proceso de inicio de sesión
+  ///
+  /// Pasos:
+  /// 1. Obtiene y valida email/password
+  /// 2. Llama al método login() del AuthProvider
+  /// 3. Si es exitoso, navega a home eliminando login del stack
+  /// 4. Si hay error, muestra SnackBar rojo con el mensaje
   Future<void> _handleLogin() async {
+    // Obtener valores de los campos y eliminar espacios
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
+    // Validación básica: campos no vacíos
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -40,22 +66,25 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       return;
     }
 
+    // Llamar al método login del AuthProvider
     final authNotifier = ref.read(authProvider.notifier);
     await authNotifier.login(email, password);
 
-    // Verificar el resultado
+    // Verificar el resultado del login
     final authState = ref.read(authProvider);
 
+    // Verificar que el widget sigue montado antes de usar context
     if (!mounted) return;
 
     if (authState.isAuthenticated) {
-      // Login exitoso - navegar a home y eliminar login del stack
+      // ✅ Login exitoso - navegar a home y eliminar login del stack
+      // pushAndRemoveUntil con (route) => false elimina todas las rutas anteriores
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const MyHomePage()),
-        (route) => false,
+        (route) => false, // Eliminar todas las rutas previas
       );
     } else if (authState.errorMessage != null) {
-      // Mostrar error
+      // ❌ Mostrar error en SnackBar rojo
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authState.errorMessage!),
@@ -67,15 +96,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Observar cambios en el estado de autenticación
     final authState = ref.watch(authProvider);
 
     return PopScope(
-      // Permitir volver atrás con el botón de hardware solo si no está cargando
+      // Permitir volver atrás SOLO si no está cargando
+      // Esto previene que el usuario salga durante la autenticación
       canPop: !authState.isLoading,
       child: Scaffold(
         appBar: AppBar(
           title: Text(context.loc?.login ?? 'Login'),
-          // Mostrar botón de retroceso solo si no está cargando
+          // Ocultar botón de retroceso durante carga
           automaticallyImplyLeading: !authState.isLoading,
         ),
         body: Padding(
@@ -83,58 +114,40 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Campo de email
-              TextField(
+              // 🔹 CAMPO DE EMAIL
+              AuthTextField(
                 controller: emailController,
+                labelText: context.loc?.email ?? 'Email',
+                icon: Icons.email,
                 keyboardType: TextInputType.emailAddress,
                 enabled: !authState.isLoading,
-                decoration: InputDecoration(
-                  labelText: context.loc?.email ?? 'Email',
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.email),
-                ),
               ),
               const SizedBox(height: 16),
 
-              // Campo de contraseña
-              TextField(
+              // 🔹 CAMPO DE CONTRASEÑA
+              AuthTextField(
                 controller: passwordController,
+                labelText: context.loc?.password ?? 'Password',
+                icon: Icons.lock,
                 obscureText: true,
                 enabled: !authState.isLoading,
-                decoration: InputDecoration(
-                  labelText: context.loc?.password ?? 'Password',
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.lock),
-                ),
                 onSubmitted: (_) => _handleLogin(),
               ),
               const SizedBox(height: 24),
 
-              // Botón de login
-              SizedBox(
-                width: double.infinity,
-                child: authState.isLoading
-                    ? ElevatedButton(
-                        onPressed: null,
-                        child: const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        ),
-                      )
-                    : GeneralButton(
-                        label: context.loc?.login ?? 'Login',
-                        onPressed: _handleLogin,
-                        icon: Icons.login,
-                      ),
+              // 🔹 BOTÓN DE LOGIN
+              AuthButton(
+                label: context.loc?.login ?? 'Login',
+                icon: Icons.login,
+                onPressed: _handleLogin,
+                isLoading: authState.isLoading,
               ),
 
               const SizedBox(height: 16),
 
-              // Enlace a registro
+              // 🔹 ENLACE A REGISTRO
+              // Navega a RegisterPage
+              // Deshabilitado durante carga
               TextButton(
                 onPressed: authState.isLoading
                     ? null
