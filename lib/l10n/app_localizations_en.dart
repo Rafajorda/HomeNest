@@ -139,6 +139,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorLabel => 'Color';
 
   @override
+  String get availableColors => 'Available colors:';
+
+  @override
   String get dimensionsLabel => 'Dimensions';
 
   @override

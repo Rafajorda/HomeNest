@@ -347,6 +347,12 @@ abstract class AppLocalizations {
   /// **'Color'**
   String get colorLabel;
 
+  /// No description provided for @availableColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Available colors:'**
+  String get availableColors;
+
   /// No description provided for @dimensionsLabel.
   ///
   /// In en, this message translates to:

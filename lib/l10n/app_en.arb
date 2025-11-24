@@ -65,6 +65,7 @@
   "loginToSeeProfile": "Login to see your profile and orders",
   
   "colorLabel": "Color",
+  "availableColors": "Available colors:",
   "dimensionsLabel": "Dimensions",
   "favoritesLabel": "Favorites",
   "addToCartButton": "Add to cart",
