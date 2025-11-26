@@ -2,9 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:proyecto_1/core/extensions/context_localization.dart';
 import 'package:proyecto_1/features/login/login_page.dart';
 
-/// Vista para usuarios no autenticados (invitados)
+/// Vista de perfil para usuarios NO autenticados (invitados)
 ///
-/// Muestra un icono grande, mensaje y botón para iniciar sesión.
+/// Muestra una pantalla de estado vacío que invita al usuario a iniciar sesión:
+/// - **Icono grande**: person_outline de 120px con opacidad 0.5
+/// - **Título**: "No has iniciado sesión"
+/// - **Subtítulo**: Explica beneficios de iniciar sesión (ver perfil, pedidos)
+/// - **Botón Login**: Navega a LoginPage con icono de login
+///
+/// Diseño:
+/// - Centrado verticalmente (MainAxisAlignment.center)
+/// - Padding de 32px en todos los lados
+/// - Textos con alineación centrada
+/// - Botón con padding horizontal de 32px y vertical de 16px
+///
+/// Esta vista se muestra automáticamente cuando:
+/// ```dart
+/// if (!authState.isAuthenticated) {
+///   return GuestProfileView();
+/// }
+/// ```
 class GuestProfileView extends StatelessWidget {
   const GuestProfileView({super.key});
 

@@ -110,7 +110,9 @@ class AuthRemoteDataSource {
     Map<String, dynamic> updates,
   ) async {
     try {
-      final uri = Uri.parse('${ApiConfig.baseUrl}/auth/me');
+      final uri = Uri.parse(
+        '${ApiConfig.baseUrl}${ApiConfig.updateProfileEndpoint}',
+      );
       final headers = ApiConfig.authHeaders(accessToken);
       final body = jsonEncode(updates);
 

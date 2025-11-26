@@ -140,6 +140,7 @@ class UserData {
     if (address != null) 'address': address,
     if (role != null) 'role': role,
     if (isActive != null) 'isActive': isActive,
+    if (avatar != null) 'avatar': avatar,
   };
 }
 
@@ -225,6 +226,57 @@ class AuthService {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  /// Actualiza el perfil del usuario en el backend
+  ///
+  /// Envía una petición PUT a /auth/profile con los campos a actualizar.
+  ///
+  /// Parámetros:
+  /// - [accessToken]: Token JWT del usuario autenticado
+  /// - [username]: Nuevo nombre de usuario (opcional)
+  /// - [firstName]: Nuevo nombre (opcional)
+  /// - [lastName]: Nuevo apellido (opcional)
+  /// - [email]: Nuevo email (opcional)
+  /// - [avatar]: Nueva URL del avatar (opcional)
+  ///
+  /// Returns: UserData actualizado con los nuevos valores
+  ///
+  /// Throws: AuthException si falla la actualización
+  ///
+  /// Ejemplo:
+  /// ```dart
+  /// final updatedUser = await authService.updateProfile(
+  ///   accessToken: token,
+  ///   firstName: 'John',
+  ///   lastName: 'Doe',
+  ///   avatar: 'https://i.pravatar.cc/150?img=10',
+  /// );
+  /// ```
+  Future<UserData> updateProfile({
+    required String accessToken,
+    String? username,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? avatar,
+  }) async {
+    try {
+      final data = await _repository.updateProfile(
+        accessToken: accessToken,
+        username: username,
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        avatar: avatar,
+      );
+      return UserData.fromJson(data);
+    } catch (e) {
+      if (e is AuthRepositoryException) {
+        throw AuthException(e.message, statusCode: e.statusCode);
+      }
+      rethrow;
     }
   }
 }

@@ -4,12 +4,43 @@ import 'package:proyecto_1/core/extensions/context_localization.dart';
 import 'package:proyecto_1/providers/auth_provider.dart';
 import 'package:proyecto_1/features/settings/settings_page.dart';
 import 'package:proyecto_1/features/home/home_page.dart';
+import 'package:proyecto_1/features/profile/edit_profile_page.dart';
 import 'profile_avatar.dart';
 import 'profile_option.dart';
 
-/// Vista para usuarios autenticados
+/// Vista de perfil para usuarios autenticados
 ///
-/// Muestra avatar, nombre, email y opciones del perfil.
+/// Muestra la información y opciones del usuario logueado:
+///
+/// **Sección superior**:
+/// - Avatar circular con inicial del nombre
+/// - Nombre del usuario en headlineSmall bold
+/// - Email con opacidad 0.6
+///
+/// **Opciones del menú** (usando ProfileOption):
+/// - Edit Profile → "Coming soon" SnackBar
+/// - My Orders → "Coming soon" SnackBar
+/// - Favorites → "Coming soon" SnackBar
+/// - Addresses → "Coming soon" SnackBar
+/// - Settings → Navega a SettingsPage
+/// - Logout (en rojo) → Muestra diálogo de confirmación
+///
+/// **Flujo de Logout**:
+/// 1. Muestra AlertDialog pidiendo confirmación
+/// 2. Si confirma → `authProvider.notifier.logout()`
+/// 3. Navega a HomePage eliminando todo el stack de navegación
+///
+/// Diseño:
+/// - SingleChildScrollView para evitar overflow en pantallas pequeñas
+/// - Divider antes del logout para separar visualmente
+/// - Usa context.loc para i18n (soporte español/inglés)
+///
+/// Esta vista se muestra cuando:
+/// ```dart
+/// if (authState.isAuthenticated) {
+///   return AuthenticatedProfileView();
+/// }
+/// ```
 class AuthenticatedProfileView extends ConsumerWidget {
   const AuthenticatedProfileView({super.key});
 
@@ -24,13 +55,16 @@ class AuthenticatedProfileView extends ConsumerWidget {
           const SizedBox(height: 32),
 
           // Avatar
-          ProfileAvatar(userName: authState.userName),
+          ProfileAvatar(
+            userName: authState.displayName,
+            avatarUrl: authState.userAvatar,
+          ),
 
           const SizedBox(height: 16),
 
           // Nombre
           Text(
-            authState.userName ?? context.loc?.user ?? 'User',
+            authState.displayName,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -53,10 +87,9 @@ class AuthenticatedProfileView extends ConsumerWidget {
             icon: Icons.person_outline,
             title: context.loc?.editProfile ?? 'Edit Profile',
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.loc?.comingSoon ?? 'Coming soon'),
-                ),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const EditProfilePage()),
               );
             },
           ),
@@ -122,9 +155,7 @@ class AuthenticatedProfileView extends ConsumerWidget {
                 builder: (context) => AlertDialog(
                   title: Text(context.loc?.logoutConfirmTitle ?? 'Logout'),
                   content: Text(
-                    context.loc?.logoutConfirmMessage(
-                          authState.userName ?? context.loc?.user ?? 'User',
-                        ) ??
+                    context.loc?.logoutConfirmMessage(authState.displayName) ??
                         context.loc?.areYouSureLogout ??
                         'Are you sure you want to logout?',
                   ),

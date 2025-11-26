@@ -165,6 +165,27 @@ class AuthRepository {
     }
   }
 
+  /// Actualiza el perfil del usuario (método simplificado)
+  ///
+  /// Wrapper de updateUserProfile que acepta parámetros individuales
+  Future<Map<String, dynamic>> updateProfile({
+    required String accessToken,
+    String? username,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? avatar,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (username != null) updates['username'] = username;
+    if (firstName != null) updates['firstName'] = firstName;
+    if (lastName != null) updates['lastName'] = lastName;
+    if (email != null) updates['email'] = email;
+    if (avatar != null) updates['avatar'] = avatar;
+
+    return await updateUserProfile(accessToken, updates);
+  }
+
   /// Cierra sesión
   ///
   /// Retorna: true si fue exitoso
