@@ -674,4 +674,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginToSeeProfileAndOrders => 'Login to see your profile and orders';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get usernameHint => 'johndoe';
+
+  @override
+  String get usernameRequired => 'Username is required';
+
+  @override
+  String get usernameMinLength => 'Username must be at least 3 characters';
+
+  @override
+  String get firstName => 'First Name';
+
+  @override
+  String get firstNameOptional => 'First Name (optional)';
+
+  @override
+  String get lastName => 'Last Name';
+
+  @override
+  String get lastNameOptional => 'Last Name (optional)';
+
+  @override
+  String get avatarURL => 'Avatar URL';
+
+  @override
+  String get avatarURLHint => 'https://i.pravatar.cc/150?img=10';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profile updated successfully';
+
+  @override
+  String errorUpdatingProfile(String error) {
+    return 'Error updating profile: $error';
+  }
 }

@@ -1396,6 +1396,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Login to see your profile and orders'**
   String get loginToSeeProfileAndOrders;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @usernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'johndoe'**
+  String get usernameHint;
+
+  /// No description provided for @usernameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Username is required'**
+  String get usernameRequired;
+
+  /// No description provided for @usernameMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Username must be at least 3 characters'**
+  String get usernameMinLength;
+
+  /// No description provided for @firstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get firstName;
+
+  /// No description provided for @firstNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name (optional)'**
+  String get firstNameOptional;
+
+  /// No description provided for @lastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name'**
+  String get lastName;
+
+  /// No description provided for @lastNameOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name (optional)'**
+  String get lastNameOptional;
+
+  /// No description provided for @avatarURL.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar URL'**
+  String get avatarURL;
+
+  /// No description provided for @avatarURLHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://i.pravatar.cc/150?img=10'**
+  String get avatarURLHint;
+
+  /// No description provided for @profileUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get profileUpdatedSuccessfully;
+
+  /// No description provided for @errorUpdatingProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating profile: {error}'**
+  String errorUpdatingProfile(String error);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

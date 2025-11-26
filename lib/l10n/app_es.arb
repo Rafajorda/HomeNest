@@ -304,5 +304,25 @@
   },
   
   "areYouSureLogout": "¿Estás seguro de que quieres cerrar sesión?",
-  "loginToSeeProfileAndOrders": "Inicia sesión para ver tu perfil y pedidos"
+  "loginToSeeProfileAndOrders": "Inicia sesión para ver tu perfil y pedidos",
+  
+  "username": "Nombre de usuario",
+  "usernameHint": "juanperez",
+  "usernameRequired": "El nombre de usuario es obligatorio",
+  "usernameMinLength": "El nombre de usuario debe tener al menos 3 caracteres",
+  "firstName": "Nombre",
+  "firstNameOptional": "Nombre (opcional)",
+  "lastName": "Apellido",
+  "lastNameOptional": "Apellido (opcional)",
+  "avatarURL": "URL del Avatar",
+  "avatarURLHint": "https://i.pravatar.cc/150?img=10",
+  "profileUpdatedSuccessfully": "Perfil actualizado exitosamente",
+  "errorUpdatingProfile": "Error al actualizar perfil: {error}",
+  "@errorUpdatingProfile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

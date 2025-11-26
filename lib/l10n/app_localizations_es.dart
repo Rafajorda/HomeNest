@@ -674,4 +674,42 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get loginToSeeProfileAndOrders => 'Inicia sesión para ver tu perfil y pedidos';
+
+  @override
+  String get username => 'Nombre de usuario';
+
+  @override
+  String get usernameHint => 'juanperez';
+
+  @override
+  String get usernameRequired => 'El nombre de usuario es obligatorio';
+
+  @override
+  String get usernameMinLength => 'El nombre de usuario debe tener al menos 3 caracteres';
+
+  @override
+  String get firstName => 'Nombre';
+
+  @override
+  String get firstNameOptional => 'Nombre (opcional)';
+
+  @override
+  String get lastName => 'Apellido';
+
+  @override
+  String get lastNameOptional => 'Apellido (opcional)';
+
+  @override
+  String get avatarURL => 'URL del Avatar';
+
+  @override
+  String get avatarURLHint => 'https://i.pravatar.cc/150?img=10';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Perfil actualizado exitosamente';
+
+  @override
+  String errorUpdatingProfile(String error) {
+    return 'Error al actualizar perfil: $error';
+  }
 }
