@@ -1,10 +1,34 @@
 import 'package:flutter/material.dart';
 
-/// Widget para mostrar un detalle del producto (título: valor)
+/// Widget reutilizable para mostrar un par clave-valor en detalles del producto
 ///
-/// Ejemplo: "Dimensiones: 10x20x30 cm"
+/// Renderiza una fila con:
+/// - **Título** (izquierda): Texto en negrita seguido de ": " (ej: "Material: ")
+/// - **Valor** (derecha): Texto normal con opacidad 0.8
+///
+/// Características:
+/// - El valor usa `Expanded` para que se ajuste al espacio disponible
+/// - Si el valor es largo, hace wrap a múltiples líneas
+/// - Padding vertical de 6px entre items
+///
+/// Casos de uso:
+/// - Mostrar dimensiones: "Dimensiones: 10x20x30 cm"
+/// - Mostrar material: "Material: Madera de roble"
+/// - Mostrar peso: "Peso: 2.5 kg"
+/// - Mostrar cualquier dato técnico del producto
+///
+/// Ejemplo de uso:
+/// ```dart
+/// ProductDetailItem(
+///   title: 'Material',
+///   value: 'Madera de roble maciza',
+/// )
+/// ```
 class ProductDetailItem extends StatelessWidget {
+  /// Texto de la etiqueta (se muestra en negrita)
   final String title;
+
+  /// Valor asociado a la etiqueta (se muestra con opacidad)
   final String value;
 
   const ProductDetailItem({

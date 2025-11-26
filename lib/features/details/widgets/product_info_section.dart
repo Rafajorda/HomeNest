@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/product.dart';
 
-/// Widget para la información principal del producto
+/// Widget para la información principal del producto en la página de detalles
 ///
-/// Muestra:
-/// - Nombre del producto (título grande y bold)
-/// - Precio con formato (color accent)
-/// - Descripción del producto (texto normal)
+/// Muestra la "tarjeta de presentación" del producto con:
+/// - **Nombre**: Título grande (24px) en negrita
+/// - **Precio**: Texto de 20px en color primary (verde oliva) con símbolo €
+/// - **Descripción**: Texto de 16px con interlineado 1.4 para legibilidad
+///
+/// Diseño:
+/// - Alineación a la izquierda para lectura natural
+/// - Espaciado vertical entre elementos (8-12px)
+/// - Opacidad 0.8 en descripción para jerarquía visual
+///
+/// Ejemplo de uso:
+/// ```dart
+/// ProductInfoSection(product: product)
+/// ```
 class ProductInfoSection extends StatelessWidget {
   final Product product;
 

@@ -1,14 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_1/core/widgets/button.dart';
 
-/// Botón de autenticación con estado de carga
+/// Botón especializado para formularios de autenticación con estado de carga
 ///
-/// Muestra un CircularProgressIndicator cuando isLoading es true,
-/// de lo contrario muestra un GeneralButton normal.
+/// Características:
+/// - Muestra CircularProgressIndicator cuando está cargando
+/// - Muestra GeneralButton normal cuando no está cargando
+/// - Ancho completo (double.infinity)
+/// - Botón deshabilitado durante carga (onPressed: null)
+///
+/// Este widget elimina código repetitivo en login_page y register_page
+/// donde se necesita mostrar loading durante las operaciones de auth.
+///
+/// Ejemplo de uso:
+/// ```dart
+/// AuthButton(
+///   label: 'Iniciar sesión',
+///   icon: Icons.login,
+///   onPressed: _handleLogin,
+///   isLoading: authState.isLoading,
+/// )
+/// ```
 class AuthButton extends StatelessWidget {
+  /// Texto que se muestra en el botón
   final String label;
+
+  /// Icono que se muestra en el botón (ej: Icons.login)
   final IconData icon;
+
+  /// Función que se ejecuta al presionar el botón
+  /// Se ignora si isLoading es true
   final VoidCallback onPressed;
+
+  /// Si el botón debe mostrar estado de carga
+  /// true = muestra CircularProgressIndicator
+  /// false = muestra botón normal con label e icon
   final bool isLoading;
 
   const AuthButton({
