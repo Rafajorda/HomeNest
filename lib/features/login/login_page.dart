@@ -88,7 +88,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authState.errorMessage!),
-          backgroundColor: Colors.red.shade700,
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     }

@@ -48,20 +48,22 @@ class AuthButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
+      width: double.infinity, // Ancho completo del contenedor padre
       child: isLoading
-          ? ElevatedButton(
-              onPressed: null,
-              child: const SizedBox(
+          ? // Estado de carga: botón deshabilitado con spinner
+            ElevatedButton(
+              onPressed: null, // Botón deshabilitado
+              child: SizedBox(
                 height: 20,
                 width: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
               ),
             )
-          : GeneralButton(label: label, onPressed: onPressed, icon: icon),
+          : // Estado normal: botón activo con GeneralButton
+            GeneralButton(label: label, onPressed: onPressed, icon: icon),
     );
   }
 }
