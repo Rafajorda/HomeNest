@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_1/features/details/details_product_page.dart';
 import '../../models/product.dart';
+import '../loading_indicator.dart';
 
 /// Card de producto para mostrar en grids o listas.
 ///
@@ -75,41 +76,46 @@ class ProductCard extends StatelessWidget {
                           height: 160,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          // Estado de carga con progress indicator
+                          // Optimización: reduce memoria cacheando en tamaño menor
+                          cacheWidth: 400,
+                          cacheHeight: 400,
+                          // Estado de carga con loading indicator personalizado
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return Container(
                               height: 160,
-                              color: Colors.grey[200],
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                               alignment: Alignment.center,
-                              child: CircularProgressIndicator(
-                                value:
-                                    loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
+                              child: const GeneralLoadingIndicator(size: 40),
                             );
                           },
                           // Estado de error con icono y mensaje
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
                               height: 160,
-                              color: Colors.grey[200],
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                               alignment: Alignment.center,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.broken_image,
                                     size: 60,
-                                    color: Colors.grey,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
                                     'Error al cargar',
                                     style: TextStyle(
-                                      color: Colors.grey[600],
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                       fontSize: 12,
                                     ),
                                   ),
@@ -174,14 +180,16 @@ class ProductCard extends StatelessWidget {
                           Icon(
                             Icons.favorite,
                             size: 16,
-                            color: Colors.red[400],
+                            color: Theme.of(context).colorScheme.error,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             '${product.favoritesCount}',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.grey[700],
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

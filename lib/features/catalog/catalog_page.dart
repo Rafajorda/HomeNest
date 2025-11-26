@@ -194,8 +194,8 @@ class _GeneralWidgetsCatalogPageState extends State<GeneralWidgetsCatalogPage> {
                   icon: const Icon(Icons.check_circle),
                   label: const Text('Éxito'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green.shade700,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   ),
                 ),
                 // SnackBar de error (rojo)
@@ -205,8 +205,8 @@ class _GeneralWidgetsCatalogPageState extends State<GeneralWidgetsCatalogPage> {
                   icon: const Icon(Icons.error),
                   label: const Text('Error'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade700,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    foregroundColor: Theme.of(context).colorScheme.onError,
                   ),
                 ),
                 // SnackBar de información (azul)
@@ -216,8 +216,8 @@ class _GeneralWidgetsCatalogPageState extends State<GeneralWidgetsCatalogPage> {
                   icon: const Icon(Icons.info),
                   label: const Text('Info'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade700,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary,
                   ),
                 ),
                 // SnackBar de advertencia (naranja)
@@ -227,8 +227,8 @@ class _GeneralWidgetsCatalogPageState extends State<GeneralWidgetsCatalogPage> {
                   icon: const Icon(Icons.warning),
                   label: const Text('Warning'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange.shade700,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    foregroundColor: Theme.of(context).colorScheme.onTertiary,
                   ),
                 ),
               ],
@@ -242,7 +242,9 @@ class _GeneralWidgetsCatalogPageState extends State<GeneralWidgetsCatalogPage> {
             Container(
               height: 300,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: GeneralErrorView(
@@ -261,7 +263,9 @@ class _GeneralWidgetsCatalogPageState extends State<GeneralWidgetsCatalogPage> {
             Container(
               height: 300,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: SingleChildScrollView(

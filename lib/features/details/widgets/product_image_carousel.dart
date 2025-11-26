@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/config/api_config.dart';
 import '../../../core/extensions/context_localization.dart';
+import '../../../core/widgets/loading_indicator.dart';
 
 /// Widget para el carrusel de imágenes del producto
 ///
@@ -112,17 +113,15 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
       fullUrl,
       fit: BoxFit.cover,
       width: double.infinity,
+      // Optimización: cachear en tamaño menor para ahorrar memoria
+      cacheWidth: 800,
+      cacheHeight: 800,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;
         return Container(
           color: theme.colorScheme.surface,
           alignment: Alignment.center,
-          child: CircularProgressIndicator(
-            value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                : null,
-          ),
+          child: const GeneralLoadingIndicator(size: 50),
         );
       },
       errorBuilder: (context, error, stackTrace) {
@@ -174,7 +173,7 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
           child: IconButton(
             icon: Icon(
               isLeft ? Icons.chevron_left : Icons.chevron_right,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               size: 32,
             ),
             onPressed: onPressed,
@@ -186,6 +185,8 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
 
   /// Construye los indicadores de página (dots)
   Widget _buildPageIndicators() {
+    final surfaceColor = Theme.of(context).colorScheme.onSurface;
+
     return Positioned(
       bottom: 16,
       left: 0,
@@ -201,8 +202,8 @@ class _ProductImageCarouselState extends State<ProductImageCarousel> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: _currentPage == index
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.5),
+                  ? surfaceColor
+                  : surfaceColor.withValues(alpha: 0.5),
             ),
           ),
         ),

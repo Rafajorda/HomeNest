@@ -213,7 +213,10 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                   },
                   child: Text(
                     context.loc!.addToCartButton,
-                    style: const TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
                   ),
                 ),
               ),

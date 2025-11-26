@@ -39,10 +39,11 @@ class GeneralSnackBar {
     String message, {
     Duration duration = _defaultDuration,
   }) {
+    final theme = Theme.of(context);
     _show(
       context,
       message,
-      backgroundColor: Colors.green.shade700,
+      backgroundColor: theme.colorScheme.primary,
       icon: Icons.check_circle,
       duration: duration,
     );
@@ -54,10 +55,11 @@ class GeneralSnackBar {
     String message, {
     Duration duration = _defaultDuration,
   }) {
+    final theme = Theme.of(context);
     _show(
       context,
       message,
-      backgroundColor: Colors.red.shade700,
+      backgroundColor: theme.colorScheme.error,
       icon: Icons.error,
       duration: duration,
     );
@@ -69,10 +71,11 @@ class GeneralSnackBar {
     String message, {
     Duration duration = _defaultDuration,
   }) {
+    final theme = Theme.of(context);
     _show(
       context,
       message,
-      backgroundColor: Colors.blue.shade700,
+      backgroundColor: theme.colorScheme.secondary,
       icon: Icons.info,
       duration: duration,
     );
@@ -84,10 +87,11 @@ class GeneralSnackBar {
     String message, {
     Duration duration = _defaultDuration,
   }) {
+    final theme = Theme.of(context);
     _show(
       context,
       message,
-      backgroundColor: Colors.orange.shade700,
+      backgroundColor: theme.colorScheme.tertiary,
       icon: Icons.warning,
       duration: duration,
     );
@@ -101,14 +105,17 @@ class GeneralSnackBar {
     required IconData icon,
     required Duration duration,
   }) {
+    final theme = Theme.of(context);
+    final textColor = theme.colorScheme.onPrimary;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
-            Icon(icon, color: Colors.white),
+            Icon(icon, color: textColor),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(message, style: const TextStyle(color: Colors.white)),
+              child: Text(message, style: TextStyle(color: textColor)),
             ),
           ],
         ),
