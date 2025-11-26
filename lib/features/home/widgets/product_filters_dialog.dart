@@ -188,9 +188,10 @@ class _ProductFiltersDialogState extends ConsumerState<ProductFiltersDialog> {
       if (hex.length == 6) {
         return Color(int.parse('FF$hex', radix: 16));
       }
-      return Colors.grey; // Color por defecto si el formato es incorrecto
+      // Color por defecto si el formato es incorrecto
+      return Theme.of(context).colorScheme.onSurfaceVariant;
     } catch (e) {
-      return Colors.grey;
+      return Theme.of(context).colorScheme.onSurfaceVariant;
     }
   }
 
@@ -274,9 +275,9 @@ class _ProductFiltersDialogState extends ConsumerState<ProductFiltersDialog> {
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
                               context.loc!.noColorsAvailable,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontStyle: FontStyle.italic,
-                                color: Colors.grey,
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
                           )
@@ -404,9 +405,9 @@ class _ProductFiltersDialogState extends ConsumerState<ProductFiltersDialog> {
                             _onlyFavorites = value;
                           });
                         },
-                        secondary: const Icon(
+                        secondary: Icon(
                           Icons.favorite,
-                          color: Colors.red,
+                          color: theme.colorScheme.error,
                         ),
                       ),
                     const SizedBox(height: 24),
