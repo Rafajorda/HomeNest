@@ -1,7 +1,4 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
 import 'package:ar_flutter_plugin_updated/ar_flutter_plugin.dart';
 import 'package:ar_flutter_plugin_updated/datatypes/config_planedetection.dart';
 import 'package:ar_flutter_plugin_updated/managers/ar_location_manager.dart';
@@ -13,16 +10,13 @@ import 'package:ar_flutter_plugin_updated/models/ar_node.dart';
 import 'package:ar_flutter_plugin_updated/models/ar_anchor.dart';
 import 'package:ar_flutter_plugin_updated/models/ar_hittest_result.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
+import '../../core/services/model_3d_service.dart';
 
 class ArViewPage extends StatefulWidget {
-  final String modelPath;
+  final String? model3DPath; // Ahora es la ruta del backend (puede ser null)
   final String modelName;
 
-  const ArViewPage({
-    super.key,
-    required this.modelPath,
-    required this.modelName,
-  });
+  const ArViewPage({super.key, this.model3DPath, required this.modelName});
 
   @override
   State<ArViewPage> createState() => _ArViewPageState();
@@ -51,52 +45,47 @@ class _ArViewPageState extends State<ArViewPage> {
   @override
   void initState() {
     super.initState();
-    _copyAssetToLocal();
+    _downloadAndPrepareModel();
   }
 
-  Future<void> _copyAssetToLocal() async {
+  Future<void> _downloadAndPrepareModel() async {
     try {
-      debugPrint('[AR] 🔍 Iniciando copia de asset: ${widget.modelPath}');
-      final directory = await getApplicationDocumentsDirectory();
-      debugPrint('[AR] 📁 Directorio de documentos: ${directory.path}');
+      debugPrint('[AR] 🔍 Iniciando preparación del modelo');
 
-      // El plugin añade "renderable" automáticamente, así que usamos solo el nombre
-      final fileName = widget.modelPath.split('/').last;
-      final filePath = '${directory.path}/$fileName';
-      final file = File(filePath);
-
-      debugPrint('[AR] 📝 Nombre del archivo: $fileName');
-      debugPrint('[AR] 📍 Ruta completa: $filePath');
-
-      if (!await file.exists()) {
-        debugPrint('[AR] 📥 Copiando asset desde: assets/${widget.modelPath}');
-        final byteData = await rootBundle.load('assets/${widget.modelPath}');
-        debugPrint(
-          '[AR] 📦 Asset cargado, tamaño: ${byteData.lengthInBytes} bytes',
-        );
-
-        await file.create(recursive: true);
-        await file.writeAsBytes(
-          byteData.buffer.asUint8List(
-            byteData.offsetInBytes,
-            byteData.lengthInBytes,
-          ),
-        );
-        debugPrint('[AR] ✅ Asset copiado exitosamente');
-      } else {
-        debugPrint('[AR] ℹ️ Asset ya existe en: $filePath');
+      if (widget.model3DPath == null || widget.model3DPath!.isEmpty) {
+        debugPrint('[AR] ⚠️ No hay modelo 3D disponible para este producto');
+        setState(() {
+          _statusMessage = '⚠️ Este producto no tiene modelo 3D disponible';
+        });
+        return;
       }
 
+      debugPrint('[AR] 📥 Descargando modelo desde: ${widget.model3DPath}');
       setState(() {
-        // Solo pasamos el nombre del archivo, no la ruta completa
+        _statusMessage = '📥 Descargando modelo 3D...';
+      });
+
+      final fileName = await Model3DService.downloadModel(widget.model3DPath);
+
+      if (fileName == null) {
+        debugPrint('[AR] ❌ Error al descargar el modelo');
+        setState(() {
+          _statusMessage = '❌ Error al descargar el modelo 3D';
+        });
+        return;
+      }
+
+      debugPrint('[AR] ✅ Modelo descargado: $fileName');
+      setState(() {
         _localModelPath = fileName;
-        debugPrint('[AR] ✅ _localModelPath establecido: $_localModelPath');
+        _statusMessage =
+            '👆 Mueve el móvil lentamente y toca una superficie plana';
       });
     } catch (e, stackTrace) {
-      debugPrint('[AR] ❌ Error copiando asset: $e');
+      debugPrint('[AR] ❌ Error preparando modelo: $e');
       debugPrint('[AR] 📋 Stack trace: $stackTrace');
       setState(() {
-        _statusMessage = '❌ Error cargando modelo: $e';
+        _statusMessage = '❌ Error preparando modelo: $e';
       });
     }
   }
