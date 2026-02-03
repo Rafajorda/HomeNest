@@ -9,6 +9,7 @@ import 'package:proyecto_1/core/widgets/error_view.dart';
 import 'package:proyecto_1/core/widgets/empty_state.dart';
 import 'package:proyecto_1/core/widgets/color_chip.dart';
 import 'package:proyecto_1/core/models/color.dart';
+import 'package:proyecto_1/features/ar/ar_view_page.dart';
 
 /// Página de catálogo que muestra todos los widgets generales disponibles.
 ///
@@ -315,6 +316,73 @@ class _GeneralWidgetsCatalogPageState extends State<GeneralWidgetsCatalogPage> {
             const SizedBox(height: 32),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          try {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ArViewPage(
+                  model3DPath: null, // Sin modelo, solo para prueba
+                  modelName: 'Radio Retro',
+                ),
+              ),
+            );
+          } catch (e) {
+            if (context.mounted) {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.error_outline, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Text('ARCore Requerido'),
+                    ],
+                  ),
+                  content: const SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Para usar Realidad Aumentada necesitas tener instalado Google Play Services for AR (ARCore).',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Pasos para instalar:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text('1. Abre Google Play Store'),
+                        Text('2. Busca "Google Play Services for AR"'),
+                        Text('3. Toca "Instalar"'),
+                        Text(
+                          '4. Espera a que se descargue (puede tardar 1-2 minutos)',
+                        ),
+                        Text('5. Vuelve a esta app y prueba de nuevo'),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('CERRAR'),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }
+        },
+        icon: const Icon(Icons.view_in_ar),
+        label: const Text('Ver Radio en AR'),
+        tooltip: 'Realidad Aumentada',
       ),
     );
   }
