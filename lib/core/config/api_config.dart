@@ -13,14 +13,15 @@
 class ApiConfig {
   /// URL base del servidor backend (NestJS)
   ///
-  /// Configuración actual: Android Emulator
+  /// Configuración actual: Dispositivo físico (Honor 90)
+  /// IP del PC en red Conselleria: 10.250.79.135
+  /// Para Android Emulator cambiar a: http://10.0.2.2:3000
   /// Para iOS Simulator cambiar a: http://localhost:3000
-  /// Para dispositivo físico cambiar a: http://TU_IP_LOCAL:3000
   ///
   /// Encontrar tu IP local:
   /// - Windows: ipconfig (buscar IPv4)
   /// - Mac/Linux: ifconfig (buscar inet)
-  static const String baseUrl = 'http://10.0.2.2:3000';
+  static const String baseUrl = 'http://10.250.79.135:3000';
 
   // Alternativa: Configuración automática según plataforma
   // static String get baseUrl {
