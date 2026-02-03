@@ -38,6 +38,9 @@ class Product {
   /// URLs de las imágenes del producto (múltiples imágenes soportadas)
   final List<String> images;
 
+  /// Ruta del modelo 3D (.glb) del producto
+  final String? model3DPath;
+
   const Product({
     required this.id,
     required this.name,
@@ -49,6 +52,7 @@ class Product {
     required this.status,
     required this.categories,
     required this.images,
+    this.model3DPath,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -159,6 +163,7 @@ class Product {
       status: json['status']?.toString() ?? 'active',
       categories: parseCategories(json['categories']),
       images: parseImages(json['images']),
+      model3DPath: json['model3DPath']?.toString(),
     );
   }
 }
