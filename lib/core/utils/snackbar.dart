@@ -65,7 +65,7 @@ class GeneralSnackBar {
     );
   }
 
-  /// Muestra un SnackBar de información (fondo azul)
+  /// Muestra un SnackBar de información (fondo Madera clara)
   static void info(
     BuildContext context,
     String message, {
