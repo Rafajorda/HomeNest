@@ -5,6 +5,7 @@ import '../../core/models/product.dart';
 import '../../core/services/favorites_service.dart';
 import '../../core/utils/snackbar.dart';
 import '../../providers/auth_provider.dart';
+import '../ar/ar_view_page.dart';
 import 'widgets/widgets.dart';
 
 /// Página de detalles de un producto.
@@ -191,6 +192,45 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
             ),
 
             const SizedBox(height: 30),
+
+            // Botón de Vista AR (si hay modelo 3D disponible)
+            if (widget.product.model3DPath != null &&
+                widget.product.model3DPath!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(color: accent, width: 2),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ArViewPage(
+                            model3DPath: widget.product.model3DPath,
+                            modelName: widget.product.name,
+                          ),
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.view_in_ar, color: accent),
+                    label: Text(
+                      'Ver en Realidad Aumentada',
+                      style: TextStyle(fontSize: 18, color: accent),
+                    ),
+                  ),
+                ),
+              ),
+
+            if (widget.product.model3DPath != null &&
+                widget.product.model3DPath!.isNotEmpty)
+              const SizedBox(height: 20),
 
             // Botón de añadir al carrito
             Padding(
