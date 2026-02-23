@@ -22,6 +22,19 @@ import 'package:flutter/material.dart';
 /// )
 /// ```
 class AppTheme {
+  // Colores de estados de pedidos (con opacidad incluida)
+  static const Color orderPendingColor = Color(0xFFF57C00); // Naranja
+  static const Color orderPendingLight = Color(0xFFFFE0B2); // Naranja claro
+  static const Color orderProcessingColor = Color(0xFF1976D2); // Azul
+  static const Color orderProcessingLight = Color(0xFFBBDEFB); // Azul claro
+  static const Color orderShippedColor = Color(0xFF7B1FA2); // Púrpura
+  static const Color orderShippedLight = Color(0xFFE1BEE7); // Púrpura claro
+  static const Color orderCompletedColor = Color(0xFF388E3C); // Verde
+  static const Color orderCompletedLight = Color(0xFFC8E6C9); // Verde claro
+  static const Color orderCancelledColor = Color(0xFFD32F2F); // Rojo
+  static const Color orderCancelledLight = Color(0xFFFFCDD2); // Rojo claro
+  static const Color orderDefaultColor = Color(0xFF757575); // Gris
+  static const Color orderDefaultLight = Color(0xFFE0E0E0); // Gris claro
   /// Tema claro con paleta natural inspirada en la naturaleza
   ///
   /// Características:
