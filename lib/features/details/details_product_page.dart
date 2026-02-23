@@ -5,6 +5,7 @@ import '../../core/models/product.dart';
 import '../../core/services/favorites_service.dart';
 import '../../core/utils/snackbar.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/cart_provider.dart';
 import '../ar/ar_view_page.dart';
 import 'widgets/widgets.dart';
 
@@ -237,7 +238,7 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: accent,
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -245,17 +246,13 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () {
-                    GeneralSnackBar.success(
-                      context,
-                      context.loc!.addedToCartMessage,
-                    );
-                  },
-                  child: Text(
+                  onPressed: () => _addToCart(context, ref),
+                  icon: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+                  label: Text(
                     context.loc!.addToCartButton,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
-                      color: Theme.of(context).colorScheme.onPrimary,
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -303,5 +300,32 @@ class _ProductDetailPageState extends ConsumerState<ProductDetailPage> {
         ),
       ),
     );
+  }
+
+  /// Añade el producto al carrito
+  Future<void> _addToCart(BuildContext context, WidgetRef ref) async {
+    // Verificar autenticación
+    if (!ref.read(authProvider).isAuthenticated) {
+      GeneralSnackBar.error(
+        context,
+        'Debes iniciar sesión para añadir productos al carrito',
+      );
+      return;
+    }
+
+    // Añadir al carrito
+    final success = await ref.read(cartProvider.notifier).addToCart(widget.product.id);
+
+    if (context.mounted) {
+      if (success) {
+        GeneralSnackBar.success(
+          context,
+          context.loc!.addedToCartMessage,
+        );
+      } else {
+        final error = ref.read(cartProvider).errorMessage ?? 'Error al añadir al carrito';
+        GeneralSnackBar.error(context, error);
+      }
+    }
   }
 }

@@ -5,6 +5,7 @@ import 'package:proyecto_1/providers/auth_provider.dart';
 import 'package:proyecto_1/features/settings/settings_page.dart';
 import 'package:proyecto_1/features/home/home_page.dart';
 import 'package:proyecto_1/features/profile/edit_profile_page.dart';
+import 'package:proyecto_1/features/orders/orders_page.dart';
 import 'profile_avatar.dart';
 import 'profile_option.dart';
 
@@ -19,7 +20,7 @@ import 'profile_option.dart';
 ///
 /// **Opciones del menú** (usando ProfileOption):
 /// - Edit Profile → "Coming soon" SnackBar
-/// - My Orders → "Coming soon" SnackBar
+/// - My Orders → Navega a OrdersPage
 /// - Favorites → "Coming soon" SnackBar
 /// - Addresses → "Coming soon" SnackBar
 /// - Settings → Navega a SettingsPage
@@ -98,10 +99,9 @@ class AuthenticatedProfileView extends ConsumerWidget {
             icon: Icons.shopping_bag_outlined,
             title: context.loc?.myOrders ?? 'My Orders',
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.loc?.comingSoon ?? 'Coming soon'),
-                ),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const OrdersPage()),
               );
             },
           ),
