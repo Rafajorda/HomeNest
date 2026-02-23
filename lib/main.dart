@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:proyecto_1/features/home/home_page.dart';
 import 'package:proyecto_1/l10n/app_localizations.dart';
 import 'package:proyecto_1/providers/theme_and_locale_provider.dart';
@@ -10,6 +11,7 @@ import 'package:proyecto_1/core/utils/snackbar.dart';
 /// Punto de entrada de la aplicación HomeNest
 ///
 /// Inicializa la app con:
+/// - **Variables de entorno**: Carga .env con configuración de API
 /// - **ProviderScope**: Contenedor de Riverpod para gestión de estado global
 /// - **MyApp**: Widget raíz de la aplicación
 ///
@@ -17,7 +19,12 @@ import 'package:proyecto_1/core/utils/snackbar.dart';
 /// - Estado de autenticación (authProvider)
 /// - Tema y locale (themeAndLocaleProvider)
 /// - Servicios (ProductService, CategoryService, etc.)
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Cargar variables de entorno desde .env
+  await dotenv.load(fileName: ".env");
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
