@@ -2,12 +2,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import '../config/api_config.dart';
 
 /// Servicio para descargar y gestionar modelos 3D (.glb) desde el backend
 class Model3DService {
-  /// URL base del backend
-  static const String _baseUrl = 'http://10.250.79.135:3000';
-
   /// Descarga un modelo 3D desde el backend y lo guarda localmente
   ///
   /// [model3DPath] - Ruta del modelo en el backend (ej: 'uploads/models/producto.glb')
@@ -21,8 +19,8 @@ class Model3DService {
     try {
       debugPrint('[Model3D] 📥 Iniciando descarga: $model3DPath');
 
-      // Construir URL completa
-      final url = '$_baseUrl/$model3DPath';
+      // Construir URL completa usando ApiConfig
+      final url = '${ApiConfig.baseUrl}/$model3DPath';
       debugPrint('[Model3D] 🌐 URL: $url');
 
       // Descargar el archivo
