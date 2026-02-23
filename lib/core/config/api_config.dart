@@ -1,27 +1,37 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
+
 /// Configuración centralizada de la API del backend
 ///
 /// Este archivo contiene:
-/// - URL base del servidor NestJS
+/// - URL base del servidor NestJS (desde .env)
 /// - Todos los endpoints de la API REST
 /// - Timeouts para peticiones HTTP
 /// - Headers por defecto y de autenticación
 ///
-/// IMPORTANTE: Actualizar baseUrl según el entorno:
-/// - Android Emulator: 10.0.2.2:3000
-/// - iOS Simulator: localhost:3000
-/// - Dispositivo físico: IP de tu ordenador (ej: 192.168.1.100:3000)
+/// IMPORTANTE: Configurar en archivo .env:
+/// - API_PORT: Puerto del servidor (normalmente 3000)
 class ApiConfig {
   /// URL base del servidor backend (NestJS)
   ///
-  /// Configuración actual: Dispositivo físico (Honor 90)
-  /// IP del PC en red Conselleria: 10.250.79.135
-  /// Para Android Emulator cambiar a: http://10.0.2.2:3000
-  /// Para iOS Simulator cambiar a: http://localhost:3000
+  /// Lee desde archivo .env:
+  /// - API_HOST: IP del servidor
+  /// - API_PORT: Puerto
   ///
-  /// Encontrar tu IP local:
-  /// - Windows: ipconfig (buscar IPv4)
-  /// - Mac/Linux: ifconfig (buscar inet)
-  static const String baseUrl = 'http://10.250.79.135:3000';
+  /// Ejemplos según entorno:
+  /// - Android Emulator: API_HOST=10.0.2.2
+  /// - iOS Simulator: API_HOST=localhost
+  /// - Dispositivo físico: API_HOST=192.168.1.100 (tu IP local)
+  static String get baseUrl {
+    final host = dotenv.env['API_HOST'] ?? 'localhost';
+    final port = dotenv.env['API_PORT'] ?? '3000';
+    if (kDebugMode) {
+      print('🌐 [ApiConfig] HOST desde .env: $host');
+      print('🌐 [ApiConfig] PORT desde .env: $port');
+      print('🌐 [ApiConfig] Base URL: http://$host:$port');
+    }
+    return 'http://$host:$port';
+  }
 
   // Alternativa: Configuración automática según plataforma
   // static String get baseUrl {
@@ -99,19 +109,40 @@ class ApiConfig {
   static const String categoriesEndpoint = '/category';
 
   // ============================================
-  // ENDPOINTS DE CARRITO (IMPLEMENTACIÓN FUTURA)
+  // ENDPOINTS DE CARRITO
   // ============================================
 
-  /// GET /cart - Obtener carrito del usuario
-  /// POST /cart/add - Añadir producto al carrito
-  /// POST /cart/remove - Eliminar producto del carrito
-  /// PUT /cart/update - Actualizar cantidad de producto
-  /// DELETE /cart/clear - Vaciar carrito
-  static const String cartEndpoint = '/cart';
-  static String addToCartEndpoint = '/cart/add';
-  static String removeFromCartEndpoint = '/cart/remove';
-  static String updateCartEndpoint = '/cart/update';
-  static String clearCartEndpoint = '/cart/clear';
+  /// GET /auth/cart - Obtener carrito del usuario
+  static const String cartEndpoint = '/auth/cart';
+
+  /// POST /auth/cart/add/:productId - Añadir producto al carrito
+  static String addToCartEndpoint(String productId) =>
+      '/auth/cart/add/$productId';
+
+  /// DELETE /auth/cart/remove/:productId - Eliminar producto del carrito
+  static String removeFromCartEndpoint(String productId) =>
+      '/auth/cart/remove/$productId';
+
+  /// DELETE /auth/cart/clear - Vaciar carrito
+  static const String clearCartEndpoint = '/auth/cart/clear';
+
+  // ============================================
+  // ENDPOINTS DE PEDIDOS/VENTAS
+  // ============================================
+
+  /// POST /auth/cart/checkout - Crear pedido desde el carrito
+  /// Headers: Authorization: Bearer `<token>`
+  /// Response: Order completa con orderLines
+  static const String checkoutEndpoint = '/auth/cart/checkout';
+
+  /// GET /order/user - Obtener todos los pedidos del usuario autenticado
+  /// Headers: Authorization: Bearer `<token>`
+  /// Response: [Order]
+  static const String myOrdersEndpoint = '/order/user';
+
+  /// GET /order/:id - Obtener un pedido específico por ID
+  /// Headers: Authorization: Bearer `<token>`
+  static String orderByIdEndpoint(String id) => '/order/$id';
 
   // ============================================
   // CONFIGURACIÓN DE TIMEOUTS
