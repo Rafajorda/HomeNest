@@ -46,6 +46,7 @@ class CartPage extends ConsumerWidget {
 
   /// Construye la vista de carrito vacío
   Widget _buildEmptyCart(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -53,19 +54,19 @@ class CartPage extends ConsumerWidget {
           Icon(
             Icons.shopping_cart_outlined,
             size: 100,
-            color: Colors.grey[400],
+            color: theme.colorScheme.onSurface.withAlpha(77),
           ),
           const SizedBox(height: 20),
           Text(
             'Tu carrito está vacío',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(color: Colors.grey[600]),
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: theme.colorScheme.onSurface.withAlpha(153),
+            ),
           ),
           const SizedBox(height: 10),
           Text(
             'Añade productos para empezar a comprar',
-            style: TextStyle(color: Colors.grey[500]),
+            style: TextStyle(color: theme.colorScheme.onSurface.withAlpha(128)),
           ),
           const SizedBox(height: 30),
           ElevatedButton.icon(
@@ -176,7 +177,12 @@ class CartPage extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text(
                     'Cantidad: ${item.quantity}',
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withAlpha(153),
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -192,7 +198,10 @@ class CartPage extends ConsumerWidget {
 
             // Botón eliminar
             IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              icon: Icon(
+                Icons.delete_outline,
+                color: Theme.of(context).colorScheme.error,
+              ),
               onPressed: () =>
                   _removeFromCart(context, ref, product.id, product.name),
             ),
@@ -204,11 +213,20 @@ class CartPage extends ConsumerWidget {
 
   /// Placeholder para imágenes
   Widget _buildImagePlaceholder() {
-    return Container(
-      width: 80,
-      height: 80,
-      color: Colors.grey[200],
-      child: Icon(Icons.image, color: Colors.grey[400], size: 40),
+    return Builder(
+      builder: (context) {
+        final theme = Theme.of(context);
+        return Container(
+          width: 80,
+          height: 80,
+          color: theme.colorScheme.surfaceContainerHighest,
+          child: Icon(
+            Icons.image,
+            color: theme.colorScheme.onSurface.withAlpha(77),
+            size: 40,
+          ),
+        );
+      },
     );
   }
 
@@ -219,13 +237,14 @@ class CartPage extends ConsumerWidget {
     CartModel cart,
     Color accent,
   ) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
+            color: theme.shadowColor.withAlpha(13),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -240,7 +259,10 @@ class CartPage extends ConsumerWidget {
               children: [
                 Text(
                   'Total de artículos:',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: theme.colorScheme.onSurface.withAlpha(179),
+                  ),
                 ),
                 Text(
                   '${cart.itemCount}',
@@ -281,18 +303,15 @@ class CartPage extends ConsumerWidget {
                 onPressed: () => _proceedToCheckout(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accent,
+                  foregroundColor: theme.colorScheme.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                icon: const Icon(Icons.payment, color: Colors.white),
+                icon: const Icon(Icons.payment),
                 label: const Text(
                   'Proceder al pago',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -347,7 +366,10 @@ class CartPage extends ConsumerWidget {
                 }
               }
             },
-            child: const Text('Vaciar', style: TextStyle(color: Colors.red)),
+            child: Text(
+              'Vaciar',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),
