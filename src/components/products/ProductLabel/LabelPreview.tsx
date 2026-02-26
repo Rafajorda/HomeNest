@@ -48,7 +48,7 @@ export const LabelPreview = forwardRef<ViewShot, LabelPreviewProps>(
 
             {/* Precio en grande en medio */}
             <Text style={styles.productPrice}>
-              ${product.price.toFixed(2)}
+              €{Number(product.price || 0).toFixed(2)}
             </Text>
 
             {/* Descripción */}

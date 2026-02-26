@@ -122,7 +122,7 @@ export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrint
               </div>
               <div class="info-section">
                 <div class="product-name">${product.name}</div>
-                <div class="product-price">$${product.price.toFixed(2)}</div>
+                <div class="product-price">€${product.price.toFixed(2)}</div>
                 ${product.description ? `<div class="product-description">${product.description}</div>` : ''}
                 ${product.dimensions ? `<div class="product-details">Tamaño: ${product.dimensions}</div>` : ''}
                 ${colorsHtml ? `<div class="colors-section"><strong style="font-size: 11px; margin-right: 8px;">Colores:</strong>${colorsHtml}</div>` : ''}
