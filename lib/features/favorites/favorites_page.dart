@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/models/order.dart';
+import '../../core/models/favorite.dart';
 import '../../providers/cart_provider.dart';
-import 'widgets/order_card.dart';
+import 'widgets/favorite_card.dart';
 
-/// Página de historial de pedidos/ventas
+/// Página de favoritos
 ///
-/// Muestra todos los pedidos del usuario con:
-/// - Número de pedido
-/// - Fecha
-/// - Estado
-/// - Total
-/// - Productos incluidos
-class OrdersPage extends ConsumerWidget {
-  const OrdersPage({super.key});
+/// Muestra todos los productos marcados como favoritos del usuario con:
+/// - Nombre del producto
+/// - Precio
+/// - Imagen
+/// - Opción para eliminar de favoritos
+class FavoritesPage extends ConsumerWidget {
+  const FavoritesPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ordersAsync = ref.watch(myOrdersProvider);
+    final favoritesAsync = ref.watch(myFavoritesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis Pedidos')),
-      body: ordersAsync.when(
-        data: (orders) {
-          if (orders.isEmpty) {
-            return _buildEmptyOrders(context);
+      appBar: AppBar(title: const Text('Mis Favoritos')),
+      body: favoritesAsync.when(
+        data: (favorites) {
+          if (favorites.isEmpty) {
+            return _buildEmptyFavorites(context);
           }
-          return _buildOrdersList(ref, orders);
+          return _buildFavoritesList(ref, favorites);
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => _buildError(context, error.toString()),
@@ -34,27 +33,27 @@ class OrdersPage extends ConsumerWidget {
     );
   }
 
-  /// Vista cuando no hay pedidos
-  Widget _buildEmptyOrders(BuildContext context) {
+  /// Vista cuando no hay favoritos
+  Widget _buildEmptyFavorites(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.receipt_long_outlined,
+            Icons.favorite_outline,
             size: 100,
             color: Theme.of(context).colorScheme.onSurface.withAlpha(102),
           ),
           const SizedBox(height: 20),
           Text(
-            'No tienes pedidos',
+            'No tienes favoritos',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withAlpha(153),
             ),
           ),
           const SizedBox(height: 10),
           Text(
-            'Tus pedidos aparecerán aquí',
+            'Guarda tus productos favoritos',
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withAlpha(128),
             ),
@@ -70,18 +69,19 @@ class OrdersPage extends ConsumerWidget {
     );
   }
 
-  /// Lista de pedidos
-  Widget _buildOrdersList(WidgetRef ref, List<OrderModel> orders) {
+  /// Lista de favoritos
+  Widget _buildFavoritesList(WidgetRef ref, List<Favorite> favorites) {
     return RefreshIndicator(
       onRefresh: () async {
-        ref.invalidate(myOrdersProvider);
-        await ref.read(myOrdersProvider.future);
+
+        ref.invalidate(myFavoritesProvider);
+        await ref.read(myFavoritesProvider.future);
       },
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: orders.length,
+        itemCount: favorites.length,
         itemBuilder: (context, index) {
-          return OrderCard(order: orders[index]);
+          return FavoriteCard(favorite: favorites[index]);
         },
       ),
     );
@@ -100,7 +100,7 @@ class OrdersPage extends ConsumerWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            'Error al cargar pedidos',
+            'Error al cargar favoritos',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 10),

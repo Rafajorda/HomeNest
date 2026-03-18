@@ -81,14 +81,24 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
     }
     return Scaffold(
       appBar: HomeAppBar(
-        onSettingsTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const SettingsPage()),
-        ),
-        onProfileTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ProfilePage()),
-        ),
+        onSettingsTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SettingsPage()),
+          );
+          if (mounted) {
+            await _loadData(_state.currentFilters);
+          }
+        },
+        onProfileTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ProfilePage()),
+          );
+          if (mounted) {
+            await _loadData(_state.currentFilters);
+          }
+        },
       ),
       body: Column(
         children: [

@@ -145,6 +145,30 @@ class ApiConfig {
   static String orderByIdEndpoint(String id) => '/order/$id';
 
   // ============================================
+  // ENDPOINTS DE FAVORITOS
+  // ============================================
+
+  /// GET /favorites - Obtener todos los favoritos del usuario autenticado
+  /// Headers: Authorization: Bearer `<token>`
+  /// Response: [Favorite]
+  static const String favoritesEndpoint = '/favorites';
+
+  /// POST /favorites - Crear un nuevo favorito
+  /// Headers: Authorization: Bearer `<token>`
+  /// Body: { productId: string }
+  /// Response: Favorite creado
+  static const String createFavoriteEndpoint = '/favorites';
+
+  /// DELETE /favorites/:id - Eliminar un favorito
+  /// Headers: Authorization: Bearer `<token>`
+  static String deleteFavoriteEndpoint(String id) => '/favorites/$id';
+
+  /// GET /favorites/check/:productId - Verificar si un producto está en favoritos
+  /// Headers: Authorization: Bearer `<token>`
+  /// Response: { isFavorite: boolean }
+  static String checkFavoriteEndpoint(String productId) =>
+      '/favorites/check/$productId';
+  // ============================================
   // CONFIGURACIÓN DE TIMEOUTS
   // ============================================
 

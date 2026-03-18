@@ -41,7 +41,7 @@ class ProductInfoSection extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          "${product.price.toStringAsFixed(2)} €",
+          "€${double.parse(product.price.toString()).toStringAsFixed(2)} €",
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w600,

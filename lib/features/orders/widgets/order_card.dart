@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/order.dart';
+import '../order_detail_page.dart';
 import '../models/order_status_config.dart';
 import 'order_status_chip.dart';
 import 'order_line_item.dart';
@@ -63,6 +64,23 @@ class OrderCard extends StatelessWidget {
         ),
         children: [
           const Divider(),
+          const SizedBox(height: 8),
+
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => OrderDetailPage(order: order),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.open_in_new, size: 18),
+              label: const Text('Ver detalle'),
+            ),
+          ),
           const SizedBox(height: 8),
 
           // Lista de productos del pedido

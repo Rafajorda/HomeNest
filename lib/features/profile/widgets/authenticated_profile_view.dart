@@ -7,6 +7,7 @@ import 'package:proyecto_1/features/home/home_page.dart';
 import 'package:proyecto_1/features/profile/edit_profile_page.dart';
 import 'package:proyecto_1/features/orders/orders_page.dart';
 import 'profile_avatar.dart';
+import 'package:proyecto_1/features/favorites/favorites_page.dart';
 import 'profile_option.dart';
 
 /// Vista de perfil para usuarios autenticados
@@ -110,22 +111,9 @@ class AuthenticatedProfileView extends ConsumerWidget {
             icon: Icons.favorite_outline,
             title: context.loc?.favorites ?? 'Favorites',
             onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.loc?.comingSoon ?? 'Coming soon'),
-                ),
-              );
-            },
-          ),
-
-          ProfileOption(
-            icon: Icons.location_on_outlined,
-            title: context.loc?.addresses ?? 'Addresses',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(context.loc?.comingSoon ?? 'Coming soon'),
-                ),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FavoritesPage()),
               );
             },
           ),

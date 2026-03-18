@@ -4,6 +4,8 @@ import '../core/models/order.dart';
 import '../core/services/cart_service.dart';
 import '../core/services/order_service.dart';
 import 'auth_provider.dart';
+import '../core/models/favorite.dart';
+import '../core/services/favorites_service.dart';
 
 /// Estado del carrito
 class CartState {
@@ -128,6 +130,7 @@ class CartNotifier extends Notifier<CartState> {
       final order = await service.checkout();
       // Después del checkout, el carrito se vacía automáticamente
       state = CartState(cart: CartModel.empty(), isLoading: false);
+      ref.invalidate(myOrdersProvider);
       return order;
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
@@ -184,4 +187,26 @@ final orderByIdProvider = FutureProvider.family<OrderModel, String>((
     throw Exception('Usuario no autenticado');
   }
   return await orderService.getOrderById(orderId);
+});
+
+// ============================================
+// PROVIDERS DE FAVORITOS
+// ============================================
+
+/// Provider del servicio de favoritos
+final favoritesServiceProvider = Provider<FavoritesService?>((ref) {
+  final authState = ref.watch(authProvider);
+  if (authState.accessToken != null) {
+    return FavoritesService(authToken: authState.accessToken);
+  }
+  return null;
+});
+
+/// Provider para obtener todos los favoritos del usuario
+final myFavoritesProvider = FutureProvider<List<Favorite>>((ref) async {
+  final favoritesService = ref.watch(favoritesServiceProvider);
+  if (favoritesService == null) {
+    throw Exception('Usuario no autenticado');
+  }
+  return await favoritesService.getMyFavorites();
 });
