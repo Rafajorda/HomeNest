@@ -1,0 +1,27 @@
+// data/colors.ts
+
+export const colorsData = [
+  { name: 'Blanco', hexCode: '#FFFFFF' },
+  { name: 'Negro', hexCode: '#000000' },
+  { name: 'Gris', hexCode: '#808080' },
+  { name: 'Gris claro', hexCode: '#D3D3D3' },
+  { name: 'Gris oscuro', hexCode: '#696969' },
+  { name: 'Beige', hexCode: '#F5F5DC' },
+  { name: 'Marrón', hexCode: '#8B4513' },
+  { name: 'Marrón claro', hexCode: '#D2691E' },
+  { name: 'Marrón oscuro', hexCode: '#654321' },
+  { name: 'Roble natural', hexCode: '#DEB887' },
+  { name: 'Nogal', hexCode: '#5C4033' },
+  { name: 'Azul', hexCode: '#0000FF' },
+  { name: 'Azul claro', hexCode: '#ADD8E6' },
+  { name: 'Azul marino', hexCode: '#000080' },
+  { name: 'Verde', hexCode: '#008000' },
+  { name: 'Verde oscuro', hexCode: '#006400' },
+  { name: 'Rojo', hexCode: '#FF0000' },
+  { name: 'Rosa', hexCode: '#FFC0CB' },
+  { name: 'Amarillo', hexCode: '#FFFF00' },
+  { name: 'Naranja', hexCode: '#FFA500' },
+  { name: 'Crema', hexCode: '#FFFDD0' },
+  { name: 'Terracota', hexCode: '#E2725B' },
+  { name: 'Blanco/Espejo', hexCode: '#F0F8FF' },
+];
