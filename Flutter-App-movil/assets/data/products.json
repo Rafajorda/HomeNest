@@ -1,0 +1,182 @@
+[
+  {
+    "id": "1",
+    "name": "Sofá Escandinavo Lino Beige",
+    "description": "Sofá de tres plazas con diseño nórdico minimalista, tapizado en lino beige y patas de madera natural.",
+    "price": 799.00,
+    "color": "Beige",
+    "dimensions": "210 x 90 x 85 cm",
+    "favoritesCount": 42,
+    "status": "active",
+    "categories": [1],
+    "images": [
+      "https://images.unsplash.com/photo-1616627455125-f3e3f1f4f28d",
+      "https://images.unsplash.com/photo-1615874959474-d609b6f1f7c1"
+    ]
+  },
+  {
+    "id": "2",
+    "name": "Sofá Modular Gris Claro",
+    "description": "Sofá modular de cinco plazas con cojines desenfundables, ideal para grandes salones modernos.",
+    "price": 1299.00,
+    "color": "Gris claro",
+    "dimensions": "300 x 100 x 90 cm",
+    "favoritesCount": 58,
+    "status": "active",
+    "categories": [1],
+    "images": [
+      "https://images.unsplash.com/photo-1598300056483-4f3e1dc6df09",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d"
+    ]
+  },
+  {
+    "id": "3",
+    "name": "Mesa de Comedor Roble Natural",
+    "description": "Mesa robusta de comedor fabricada en roble macizo, acabado natural con capacidad para 6 personas.",
+    "price": 950.00,
+    "color": "Roble natural",
+    "dimensions": "180 x 90 x 75 cm",
+    "favoritesCount": 35,
+    "status": "active",
+    "categories": [2],
+    "images": [
+      "https://images.unsplash.com/photo-1598300056483-4f3e1dc6df09",
+      "https://images.unsplash.com/photo-1616627455125-f3e3f1f4f28d"
+    ]
+  },
+  {
+    "id": "4",
+    "name": "Mesa Auxiliar Mármol Blanco",
+    "description": "Mesa auxiliar redonda con tapa de mármol blanco y estructura dorada, ideal para espacios elegantes.",
+    "price": 320.00,
+    "color": "Blanco / Dorado",
+    "dimensions": "50 x 50 x 45 cm",
+    "favoritesCount": 18,
+    "status": "active",
+    "categories": [2, 5],
+    "images": [
+      "https://images.unsplash.com/photo-1582582424700-8c62b7e1f8df",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7"
+    ]
+  },
+  {
+    "id": "5",
+    "name": "Silla de Comedor Tapizada Verde Oliva",
+    "description": "Silla ergonómica tapizada en terciopelo verde olivo con patas de acero negro mate.",
+    "price": 180.00,
+    "color": "Verde olivo",
+    "dimensions": "55 x 60 x 85 cm",
+    "favoritesCount": 61,
+    "status": "active",
+    "categories": [3],
+    "images": [
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc",
+      "https://images.unsplash.com/photo-1598300056483-4f3e1dc6df09"
+    ]
+  },
+  {
+    "id": "6",
+    "name": "Silla de Madera Clásica",
+    "description": "Silla de comedor con estructura de madera maciza y asiento tapizado en lino crema.",
+    "price": 150.00,
+    "color": "Madera / Crema",
+    "dimensions": "48 x 50 x 90 cm",
+    "favoritesCount": 25,
+    "status": "active",
+    "categories": [3],
+    "images": [
+      "https://images.unsplash.com/photo-1616627455125-f3e3f1f4f28d",
+      "https://images.unsplash.com/photo-1598300056483-4f3e1dc6df09"
+    ]
+  },
+  {
+    "id": "7",
+    "name": "Lámpara Colgante Industrial",
+    "description": "Lámpara metálica de estilo industrial con acabado negro mate, perfecta para comedores o cocinas.",
+    "price": 240.00,
+    "color": "Negro mate",
+    "dimensions": "Ø35 x 150 cm",
+    "favoritesCount": 52,
+    "status": "active",
+    "categories": [4],
+    "images": [
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511",
+      "https://images.unsplash.com/photo-1582582424700-8c62b7e1f8df"
+    ]
+  },
+  {
+    "id": "8",
+    "name": "Lámpara de Pie Minimalista",
+    "description": "Lámpara de pie con base metálica y pantalla cilíndrica de lino blanco, ideal para ambientes cálidos.",
+    "price": 190.00,
+    "color": "Negro / Blanco",
+    "dimensions": "160 cm altura",
+    "favoritesCount": 44,
+    "status": "active",
+    "categories": [4],
+    "images": [
+      "https://images.unsplash.com/photo-1567016432779-094069958ea5",
+      "https://images.unsplash.com/photo-1582582424700-8c62b7e1f8df"
+    ]
+  },
+  {
+    "id": "9",
+    "name": "Espejo Redondo de Madera",
+    "description": "Espejo decorativo con marco circular de madera natural, ideal para pasillos o dormitorios.",
+    "price": 110.00,
+    "color": "Madera natural",
+    "dimensions": "Ø70 cm",
+    "favoritesCount": 73,
+    "status": "active",
+    "categories": [5],
+    "images": [
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d",
+      "https://images.unsplash.com/photo-1598300056483-4f3e1dc6df09"
+    ]
+  },
+  {
+    "id": "10",
+    "name": "Estantería Metálica Negra",
+    "description": "Estantería moderna de metal negro con cinco baldas de madera clara. Diseño abierto y funcional.",
+    "price": 420.00,
+    "color": "Negro / Madera clara",
+    "dimensions": "180 x 90 x 35 cm",
+    "favoritesCount": 39,
+    "status": "active",
+    "categories": [5],
+    "images": [
+      "https://images.unsplash.com/photo-1598300056483-4f3e1dc6df09",
+      "https://images.unsplash.com/photo-1616627455125-f3e3f1f4f28d"
+    ]
+  },
+  {
+    "id": "11",
+    "name": "Butaca de Lectura Azul Marino",
+    "description": "Butaca acolchada en terciopelo azul marino con patas doradas. Ideal para rincones de lectura.",
+    "price": 340.00,
+    "color": "Azul marino / Dorado",
+    "dimensions": "90 x 85 x 100 cm",
+    "favoritesCount": 64,
+    "status": "active",
+    "categories": [1, 5],
+    "images": [
+      "https://images.unsplash.com/photo-1616627455125-f3e3f1f4f28d",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7"
+    ]
+  },
+  {
+    "id": "12",
+    "name": "Mesa de Centro Nogal",
+    "description": "Mesa de centro rectangular de madera de nogal, con bordes redondeados y acabado satinado.",
+    "price": 360.00,
+    "color": "Nogal oscuro",
+    "dimensions": "120 x 60 x 45 cm",
+    "favoritesCount": 47,
+    "status": "active",
+    "categories": [2],
+    "images": [
+      "https://images.unsplash.com/photo-1616627455125-f3e3f1f4f28d",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d"
+    ]
+  }
+]
