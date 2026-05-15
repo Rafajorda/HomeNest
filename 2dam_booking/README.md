@@ -32,14 +32,6 @@ API REST completa para una aplicación de e-commerce que incluye:
 - Gestión de órdenes y líneas de pedido
 - Modelos 3D de productos
 
-## 🔗 Ecosistema del Workspace
-
-Este backend forma parte de un workspace con 3 proyectos:
-
-- [Guía raíz del workspace](../README.md)
-- [AdminApp (panel admin)](../AdminApp/README.md)
-- [Flutter-App-movil (app cliente)](../Flutter-App-movil/README.md)
-
 ---
 
 ## 🛠️ Tecnologías
@@ -233,26 +225,65 @@ Usuario regular:
 La documentación interactiva de la API está disponible en:
 
 ```
-http://localhost:3000/api/docs
+http://localhost:3000/api
 ```
 
 ### Colecciones principales
 
-Controladores principales expuestos por la API:
+#### 🔐 Auth (`/auth`)
 
-- `auth` -> `/auth/*`
-- `users` -> `/users/*`
-- `product` -> `/product/*`
-- `category` -> `/category/*`
-- `color` -> `/color/*`
-- `cart` -> `/cart/*`
-- `favorites` -> `/favorites/*`
-- `order` -> `/order/*`
-- `orderline` -> `/orderline/*`
-- `images` -> `/images/*`
-- `models` -> `/models/*`
+- `POST /auth/register` - Registrar usuario
+- `POST /auth/login` - Iniciar sesión
+- `POST /auth/refresh` - Renovar access token
+- `POST /auth/logout` - Cerrar sesión
+- `GET /auth/profile` - Obtener perfil (autenticado)
+- `PUT /auth/profile` - Actualizar perfil (autenticado)
+- `GET /auth/orders` - Ver órdenes propias (autenticado)
 
-> Recomendacion: usa Swagger (`/api/docs`) como fuente de verdad para payloads y respuestas, ya que se genera desde los DTOs/controladores actuales.
+#### 👥 Users (`/users`)
+
+- `GET /users` - Listar usuarios (admin)
+- `POST /users` - Crear usuario (admin)
+- `GET /users/:id` - Ver usuario (admin)
+- `PUT /users/:id` - Actualizar usuario (admin)
+- `DELETE /users/:id` - Eliminar usuario (admin)
+
+#### 📦 Products (`/products`)
+
+- `GET /products` - Listar productos (público)
+- `POST /products` - Crear producto (admin)
+- `GET /products/:id` - Ver producto (público)
+- `PUT /products/:id` - Actualizar producto (admin)
+- `DELETE /products/:id` - Eliminar producto (admin)
+
+#### 🏷️ Categories (`/categories`)
+
+- `GET /categories` - Listar categorías (público)
+- `POST /categories` - Crear categoría (admin)
+- `PUT /categories/:id` - Actualizar categoría (admin)
+- `DELETE /categories/:id` - Eliminar categoría (admin)
+
+#### 🛒 Cart (`/cart`)
+
+- `GET /cart` - Ver carrito (autenticado)
+- `POST /cart/add` - Añadir producto (autenticado)
+- `PUT /cart/product/:id` - Actualizar cantidad (autenticado)
+- `DELETE /cart/product/:id` - Eliminar producto (autenticado)
+- `DELETE /cart/clear` - Vaciar carrito (autenticado)
+
+#### ⭐ Favorites (`/favorites`)
+
+- `GET /favorites` - Listar favoritos (autenticado)
+- `POST /favorites` - Añadir favorito (autenticado)
+- `DELETE /favorites/:id` - Eliminar favorito (autenticado)
+
+#### 📋 Orders (`/orders`)
+
+- `GET /orders` - Listar todas (admin)
+- `POST /orders` - Crear orden (admin)
+- `GET /orders/:id` - Ver orden (admin)
+- `PUT /orders/:id` - Actualizar orden (admin)
+- `DELETE /orders/:id` - Eliminar orden (admin)
 
 ---
 
@@ -379,7 +410,7 @@ Este backend implementa un sistema de autenticación moderno con **rotación de 
 
 ### Implementación en Frontend (Flutter)
 
-Implementa almacenamiento seguro de `access_token` y `refresh_token`, y renueva token con `/auth/refresh` antes de expirar.
+Consulta el archivo [`AUTH_TOKENS.md`](./AUTH_TOKENS.md) para guía completa de implementación con interceptores HTTP y manejo automático de refresh.
 
 #### Quick Start
 
@@ -450,14 +481,15 @@ npm run test:watch
 
 ### Docker (opcional)
 
-Este repositorio ya incluye `docker-compose.yml` y `Dockerfile` para levantar API + MySQL.
-
-```bash
-# levantar servicios
-docker compose up --build
-
-# detener servicios
-docker compose down
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["node", "dist/main"]
 ```
 
 ---
@@ -515,7 +547,7 @@ Este proyecto es privado y no tiene licencia pública.
 Para preguntas o problemas:
 
 1. Revisa la [documentación de NestJS](https://docs.nestjs.com)
-2. Revisa Swagger en `http://localhost:3000/api/docs`
+2. Revisa el archivo `AUTH_TOKENS.md` para temas de autenticación
 3. Abre un issue en el repositorio
 
 ---

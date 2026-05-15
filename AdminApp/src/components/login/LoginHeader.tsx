@@ -44,31 +44,18 @@ export const LoginHeader = () => {
   const styles = getStyles(theme);
 
   return (
-    // Contenedor principal centrado
     <View style={styles.header}>
-      {/* ========================================
-          SECCIÓN: LOGO
-          Círculo con emoji de tienda
-          ======================================== */}
-      <View style={styles.logoContainer}>
-        <Text style={styles.logoText}>🛍️</Text> {/* Emoji de tienda */}
-      </View>
-      
-      {/* ========================================
-          SECCIÓN: TÍTULO PRINCIPAL
-          "Admin Panel" en tipografía grande
-          ======================================== */}
-      <Text variant="headlineLarge" style={styles.title}>
-        Admin Panel
-      </Text>
-      
-      {/* ========================================
-          SECCIÓN: SUBTÍTULO
-          "Inicia sesión para continuar"
-          ======================================== */}
-      <Text variant="bodyLarge" style={styles.subtitle}>
-        Inicia sesión para continuar
-      </Text>
+      {[
+        <View key="logo" style={styles.logoContainer}>
+          <Text style={styles.logoText}>🛍️</Text>
+        </View>,
+        <Text key="title" variant="headlineLarge" style={styles.title}>
+          Admin Panel
+        </Text>,
+        <Text key="subtitle" variant="bodyLarge" style={styles.subtitle}>
+          Inicia sesión para continuar
+        </Text>,
+      ]}
     </View>
   );
 };

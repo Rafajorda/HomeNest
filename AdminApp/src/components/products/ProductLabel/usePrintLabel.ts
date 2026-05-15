@@ -6,25 +6,60 @@
 
 import { Alert, Platform } from 'react-native';
 import * as Print from 'expo-print';
+import ViewShot from 'react-native-view-shot';
+import QRCode from 'qrcode';
 import { Product } from '../../../types/product';
 import { colors } from '../../../theme';
 
 interface UsePrintLabelProps {
   product: Product;
   selectedColors: string[];
+  viewShotRef: React.RefObject<ViewShot | null>;
 }
 
-export const usePrintLabel = ({ product, selectedColors }: UsePrintLabelProps) => {
+export const usePrintLabel = ({ product, selectedColors, viewShotRef }: UsePrintLabelProps) => {
   const handlePrint = async () => {
     try {
+      let qrImageUri: string;
       const productUrl = `myapp://product/${product.id}`;
-      // Usar una URL HTTPS del QR para asegurar compatibilidad en el motor de impresión móvil.
-      const qrImageUri = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&format=png&data=${encodeURIComponent(productUrl)}`;
+
+      // En web, generar un QR embebido para evitar imágenes rotas al imprimir o guardar PDF
+      // En mobile/tablet, capturar la vista
+      if (Platform.OS === 'web') {
+        qrImageUri = await QRCode.toDataURL(productUrl, {
+          width: 130,
+          margin: 1,
+          errorCorrectionLevel: 'M',
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF',
+          },
+        });
+      } else {
+        // En mobile/tablet, capturar la vista y convertirla a data URL
+        if (!viewShotRef.current) {
+          Alert.alert('Error', 'No se pudo acceder a la vista');
+          return;
+        }
+
+        const captured = await (viewShotRef.current as any).capture?.({
+          result: 'base64',
+          format: 'png',
+          quality: 1,
+        });
+        
+        if (!captured) {
+          Alert.alert('Error', 'No se pudo generar la etiqueta');
+          return;
+        }
+        
+        qrImageUri = captured.startsWith('data:') ? captured : `data:image/png;base64,${captured}`;
+      }
 
       // Generar HTML de colores
       const colorsHtml = product.colors && product.colors.length > 0
         ? product.colors.map(color => {
-            const isSelected = selectedColors.includes(color.name);
+            const isSelected = selectedColors.includes(color.id);
             return `
               <div style="display: inline-flex; align-items: center; margin-right: 10px;">
                 <div style="width: 16px; height: 16px; border: 2px solid #333; border-radius: 50%; margin-right: 4px; ${isSelected ? 'background: #333;' : ''}"></div>
@@ -120,6 +155,8 @@ export const usePrintLabel = ({ product, selectedColors }: UsePrintLabelProps) =
               }
               img {
                 display: block;
+                -webkit-user-select: none;
+                user-select: none;
               }
             </style>
           </head>

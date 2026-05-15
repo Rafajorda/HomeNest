@@ -1,14 +1,6 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet } from 'react-native';
 
-const { width: screenWidth } = Dimensions.get('window');
-// Calcular ancho de la etiqueta: 90% del ancho de pantalla, máximo 500px
-const labelWidth = Math.min(screenWidth * 0.9, 500);
-// Altura proporcional: mantener aspecto 2:1 (ancho:alto)
-const labelHeight = labelWidth / 2;
-// QR size: ~30% del ancho de la etiqueta
-const qrSize = Math.min(labelWidth * 0.26, 130);
-
-export const getStyles = (theme: any) => StyleSheet.create({
+export const getStyles = (theme: any, labelWidth: number, qrSize: number) => StyleSheet.create({
   container: {
     alignSelf: 'center',
     width: '100%',
@@ -16,45 +8,47 @@ export const getStyles = (theme: any) => StyleSheet.create({
   },
   label: {
     width: labelWidth,
-    height: labelHeight,
+    minHeight: Math.round(labelWidth * 0.5),
     borderWidth: 2,
     borderColor: theme.colors.primary,
     borderRadius: 8,
     padding: 15,
     backgroundColor: 'white',
     flexDirection: 'row',
+    overflow: 'hidden',
   },
   qrSection: {
-    width: qrSize + 20,
+    width: qrSize + 28,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 15,
+    marginRight: 16,
+    minHeight: qrSize + 28,
   },
   infoSection: {
     flex: 1,
     justifyContent: 'space-between',
   },
   productName: {
-    fontSize: labelWidth > 400 ? 20 : 16,
+    fontSize: labelWidth > 540 ? 22 : labelWidth > 400 ? 20 : 16,
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 8,
   },
   productPrice: {
-    fontSize: labelWidth > 400 ? 36 : 28,
+    fontSize: labelWidth > 540 ? 40 : labelWidth > 400 ? 36 : 28,
     fontWeight: 'bold',
     color: theme.colors.primary,
     textAlign: 'center',
     marginVertical: 8,
   },
   productDescription: {
-    fontSize: labelWidth > 400 ? 11 : 10,
+    fontSize: labelWidth > 540 ? 12 : labelWidth > 400 ? 11 : 10,
     color: '#444',
-    lineHeight: labelWidth > 400 ? 16 : 14,
+    lineHeight: labelWidth > 540 ? 18 : labelWidth > 400 ? 16 : 14,
     marginBottom: 6,
   },
   productDetails: {
-    fontSize: labelWidth > 400 ? 11 : 10,
+    fontSize: labelWidth > 540 ? 12 : labelWidth > 400 ? 11 : 10,
     color: '#666',
     marginBottom: 4,
   },

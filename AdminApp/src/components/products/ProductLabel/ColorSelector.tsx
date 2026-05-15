@@ -13,7 +13,7 @@ import { styles } from './ColorSelector.styles';
 interface ColorSelectorProps {
   colors: Color[];
   selectedColors: string[];
-  onToggleColor: (colorName: string) => void;
+  onToggleColor: (colorId: string) => void;
 }
 
 export const ColorSelector = ({ colors, selectedColors, onToggleColor }: ColorSelectorProps) => {
@@ -28,8 +28,8 @@ export const ColorSelector = ({ colors, selectedColors, onToggleColor }: ColorSe
         {colors.map((color) => (
           <View key={color.id} style={styles.colorItem}>
             <Checkbox
-              status={selectedColors.includes(color.name) ? 'checked' : 'unchecked'}
-              onPress={() => onToggleColor(color.name)}
+              status={selectedColors.includes(color.id) ? 'checked' : 'unchecked'}
+              onPress={() => onToggleColor(color.id)}
             />
             <Text>{color.name}</Text>
           </View>

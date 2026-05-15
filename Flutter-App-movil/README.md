@@ -20,14 +20,6 @@ Una aplicación móvil moderna de e-commerce construida con Flutter, enfocada en
 
 > *Próximamente: Agregar screenshots de la app en funcionamiento*
 
-## 🔗 Ecosistema del Workspace
-
-Este proyecto forma parte de un workspace con 3 piezas:
-
-- [Guia raiz del workspace](../README.md)
-- [2dam_booking (backend)](../2dam_booking/README.md)
-- [AdminApp (panel admin)](../AdminApp/README.md)
-
 ---
 
 ## ✨ Características
@@ -96,7 +88,7 @@ Este proyecto forma parte de un workspace con 3 piezas:
 1. **Clonar el repositorio**
 ```bash
 git clone https://github.com/Rafajorda/Flutter-App-movil.git
-cd Flutter-App-movil
+cd proyecto_1
 ```
 
 2. **Instalar dependencias**
@@ -110,14 +102,11 @@ flutter gen-l10n
 ```
 
 4. **Configurar el backend**
-
-  Copia `.env.example` a `.env` y ajusta:
-  ```env
-  API_HOST=192.168.1.100
-  API_PORT=3000
-  ```
-
-  La app construye la URL final desde `lib/core/config/api_config.dart`.
+   
+   Edita `lib/core/config/api_config.dart` y configura la URL de tu API:
+   ```dart
+   static const String baseUrl = 'http://tu-api.com';
+   ```
 
 5. **Ejecutar la aplicación**
 ```bash
@@ -204,7 +193,7 @@ API / Local Storage
 - **Material Design 3** - Sistema de diseño moderno
 - **Cupertino Icons** 1.0.8 - Iconos iOS-style
 - **flutter_3d_controller** 2.3.0 - Visor 3D
-- **ar_flutter_plugin_updated** 0.0.1 - Realidad aumentada
+- **arcore_flutter_plugin** 0.1.0 - Realidad aumentada
 
 ### Internacionalización
 - **flutter_localizations** - Soporte i18n
@@ -268,6 +257,7 @@ flutter gen-l10n
 supportedLocales: [
   Locale('es'),
   Locale('en'),
+  Locale('fr'),  // Nuevo idioma
 ],
 ```
 
@@ -278,27 +268,23 @@ supportedLocales: [
 ### Endpoints Utilizados
 
 #### Autenticación
-- `POST /auth/login` - Iniciar sesión
-- `POST /auth/register` - Registrar usuario
-- `POST /auth/refresh` - Renovar access token
-- `GET /auth/profile` - Obtener usuario actual
-- `PUT /auth/profile` - Actualizar perfil
+- `POST /api/auth/login` - Iniciar sesión
+- `POST /api/auth/register` - Registrar usuario
+- `GET /api/auth/me` - Obtener usuario actual
+- `PUT /api/auth/profile` - Actualizar perfil
 
 #### Productos
-- `GET /product` - Listar productos (con filtros)
-- `GET /product/:id` - Detalle de producto
+- `GET /api/products` - Listar productos (con filtros)
+- `GET /api/products/:id` - Detalle de producto
+- `GET /api/products/search` - Buscar productos
 
 #### Categorías
-- `GET /category` - Listar categorías
+- `GET /api/categories` - Listar categorías
 
 #### Favoritos
-- `GET /favorites` - Listar favoritos del usuario
-- `POST /favorites` - Agregar a favoritos
-- `DELETE /favorites/:id` - Quitar de favoritos
-
-#### Pedidos
-- `GET /order/user` - Pedidos del usuario autenticado
-- `GET /order/:id` - Detalle de pedido
+- `GET /api/favorites` - Listar favoritos del usuario
+- `POST /api/favorites/:productId` - Agregar a favoritos
+- `DELETE /api/favorites/:productId` - Quitar de favoritos
 
 ### Formato de Respuesta
 

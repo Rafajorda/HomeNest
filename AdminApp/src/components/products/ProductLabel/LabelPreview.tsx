@@ -5,7 +5,7 @@
  */
 
 import React, { forwardRef } from 'react';
-import { View, Text, Dimensions } from 'react-native';
+import { View, Text, useWindowDimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import ViewShot from 'react-native-view-shot';
 import { Product } from '../../../types/product';
@@ -18,15 +18,14 @@ interface LabelPreviewProps {
   productUrl: string;
 }
 
-// Calcular tamaño del QR de forma consistente con los estilos
-const { width: screenWidth } = Dimensions.get('window');
-const labelWidth = Math.min(screenWidth * 0.9, 500);
-const qrSize = Math.min(labelWidth * 0.26, 130);
-
 export const LabelPreview = forwardRef<ViewShot, LabelPreviewProps>(
   ({ product, selectedColors, productUrl }, ref) => {
+    const { width: screenWidth } = useWindowDimensions();
     const theme = useTheme();
-    const styles = getStyles(theme);
+    const isTablet = screenWidth >= 768;
+    const labelWidth = Math.min(screenWidth * (isTablet ? 0.5 : 0.92), isTablet ? 420 : 500);
+    const qrSize = Math.min(labelWidth * 0.28, isTablet ? 120 : 130);
+    const styles = getStyles(theme, labelWidth, qrSize);
     
     return (
       <ViewShot
@@ -80,7 +79,7 @@ export const LabelPreview = forwardRef<ViewShot, LabelPreviewProps>(
                     <View key={color.id} style={styles.colorCircleItem}>
                       <View style={[
                         styles.colorCircle,
-                        selectedColors.includes(color.name) && styles.colorCircleSelected
+                        selectedColors.includes(color.id) && styles.colorCircleSelected
                       ]} />
                       <Text style={styles.colorName}>{color.name}</Text>
                     </View>
